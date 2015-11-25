@@ -5,8 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlackHole.Master"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+        Title="MainWindow" Height="500" Width="1000">
+    <Grid Background="Linen">
+        <DockPanel>           
+            <StatusBar DockPanel.Dock="Bottom" Height="26" Margin="10" BorderThickness="2" BorderBrush="Black" Background="White">
+                <StatusBar.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="100" />
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                    </ItemsPanelTemplate>
+                </StatusBar.ItemsPanel>
+                <StatusBarItem Grid.Column="0">
+                    <TextBlock Text="Waiting for slaves.." />
+                </StatusBarItem>
+                <Separator Grid.Column="1" Width="2" />
+                <StatusBarItem Grid.Column="2">
+                    <ProgressBar Value="100" Width="200" Height="15" />
+                </StatusBarItem>
+            </StatusBar>
+            <ListView Name="SlavesList" Margin="10" DockPanel.Dock="Top">               
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="IP" Width="200" DisplayMemberBinding="{Binding Ip}" />
+                        <GridViewColumn Header="OS" Width="250" DisplayMemberBinding="{Binding OperatingSystem}" />
+                        <GridViewColumn Header="Machine" Width="150" DisplayMemberBinding="{Binding MachineName}" />
+                        <GridViewColumn Header="Name" Width="150" DisplayMemberBinding="{Binding UserName}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </DockPanel>
     </Grid>
 </Window>

@@ -13,5 +13,14 @@ namespace BlackHole.Master
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            Startup += new StartupEventHandler(App_Startup);
+        }
+
+        void App_Startup(object sender, StartupEventArgs e)
+        {
+            Master.MainWindow.Instance.Show();
+        }
     }
 }

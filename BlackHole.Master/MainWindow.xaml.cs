@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlackHole.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,42 @@ namespace BlackHole.Master
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public static MainWindow Instance
+        {
+            get; private set;
+        }
+
+        static MainWindow()
+        {
+            Instance = new MainWindow();
+        }
+
+        private MainWindow()
         {
             InitializeComponent();
+
+            Closing += MainWindow_Closing;
+
+            NetworkService.Instance.Start();
+            NetworkService.Instance.OnSlaveConnected += OnSlaveConnected;
+        }
+
+        private void OnSlaveConnected(Slave slave)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                SlavesList.Items.Add(slave);
+            });
+        }
+
+        private void OnSlaveDisconnected(Slave slave)
+        {
+            SlavesList.Items.Remove(slave);
+        }
+        
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            NetworkService.Instance.Stop();
         }
     }
 }

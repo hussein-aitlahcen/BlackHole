@@ -9,7 +9,8 @@ namespace BlackHole.Slave
     class Program
     {
         static void Main(string[] args)
-        {            
+        {
+            NetworkService.Instance.Initialize();
         }
     }
 }

