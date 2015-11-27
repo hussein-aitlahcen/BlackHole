@@ -18,6 +18,7 @@ namespace BlackHole.Master
         CONNECTED,
         DISCONNECTED,
         INCOMMING_MESSAGE,
+        FILE_DOWNLOADED,
     }
 
     /// <summary>
@@ -162,6 +163,16 @@ namespace BlackHole.Master
         public void DecrementPingTimeout()
         {
             PingTimeout--;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="rawFile"></param>
+        public void SaveDownloadedFile(string name, byte[] rawFile)
+        {
+            FileHelper.SaveDownloadedFile(MachineName, name, rawFile);
         }
 
         /// <summary>

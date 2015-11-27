@@ -27,7 +27,7 @@ namespace BlackHole.Master
         {
             InitializeComponent();
 
-            Loaded += OnNavigate;
+            Loaded += OnNavigate;            
         }
 
         /// <summary>
@@ -50,6 +50,23 @@ namespace BlackHole.Master
             var file = ((ListViewItem)sender).Content as FileMeta;
             if (file.Type == FileType.FOLDER)
                 NavigateToFolder(file.Name);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnDownloadFile(object sender, RoutedEventArgs e)
+        {
+            if (FilesList.SelectedItem == null)
+                return;
+
+            var file = (FileMeta)FilesList.SelectedItem;
+            if (file.Type != FileType.FILE)
+                return;
+
+            DownloadFile(file.Name);
         }
     }
 }

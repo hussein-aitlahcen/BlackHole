@@ -84,7 +84,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="window"></param>
-        private void RegisterOrOpenChildWindow(Window window)
+        private async void RegisterOrOpenChildWindow(Window window)
         {
             // we dont need to continue if the window isnt a slave window
             var slaveWindow = window as ISlaveWindow;
@@ -94,11 +94,11 @@ namespace BlackHole.Master
             // focus the existing window
             var existingWindow = m_childWindows
                 .OfType<ISlaveWindow>()
-                .FirstOrDefault(w => (w.SlaveId == w.SlaveId) && (w.GetType() == slaveWindow.GetType()));
+                .FirstOrDefault(w => (w.SlaveId == slaveWindow.SlaveId) && (w.GetType() == slaveWindow.GetType()));
             if (existingWindow != null)
             {
                 var w = existingWindow as Window;
-                w.ExecuteInDispatcher(() => w.Focus());
+                await w.ExecuteInDispatcher(() => w.Focus());
                 return;
             }
 

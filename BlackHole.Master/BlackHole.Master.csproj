@@ -63,12 +63,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FileHelper.cs" />
     <Compile Include="FileManager.xaml.cs">
       <DependentUpon>FileManager.xaml</DependentUpon>
     </Compile>
     <Compile Include="FileManagerPartial.cs" />
     <Compile Include="ISlaveWindow.cs" />
     <Compile Include="MainWindowPartial.cs" />
+    <Compile Include="Model\FileDownload.cs" />
     <Compile Include="Slave.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="WindowExtensions.cs" />
