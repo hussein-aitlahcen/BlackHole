@@ -48,9 +48,19 @@
             </ListView.ContextMenu>
         </ListView>
         <ListView Name="DownloadsList" Height="200" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Row="2">
+            <ListView.Resources>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Download}" Value="1">
+                            <Setter Property="Background" Value="Beige" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="FileName" Width="200" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Id}" />
+                    <GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding Name}" />
                     <GridViewColumn Header="Progession" Width="300" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

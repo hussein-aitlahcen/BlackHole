@@ -71,6 +71,9 @@
     <Compile Include="ISlaveWindow.cs" />
     <Compile Include="MainWindowPartial.cs" />
     <Compile Include="Model\FileDownload.cs" />
+    <Compile Include="Model\FileTransaction.cs" />
+    <Compile Include="Model\FileUpload.cs" />
+    <Compile Include="Model\ViewModel.cs" />
     <Compile Include="Slave.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="WindowExtensions.cs" />

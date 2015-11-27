@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlackHole.Common.Network.Protocol;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,13 @@ namespace BlackHole.Master
 {
     public static class WindowExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="message"></param>
+        public static void Send(this ISlaveWindow window, NetMessage message) => window.Slave.Send(message);
+
         /// <summary>
         /// 
         /// </summary>

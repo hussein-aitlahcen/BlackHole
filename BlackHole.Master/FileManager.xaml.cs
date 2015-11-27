@@ -59,14 +59,12 @@ namespace BlackHole.Master
         /// <param name="e"></param>
         private void OnDownloadFile(object sender, RoutedEventArgs e)
         {
-            if (FilesList.SelectedItem == null)
+            if (FilesList.SelectedItems.Count == 0)
                 return;
 
-            var file = (FileMeta)FilesList.SelectedItem;
-            if (file.Type != FileType.FILE)
-                return;
-
-            DownloadFile(file.Name);
+            foreach(var file in FilesList.SelectedItems.OfType<FileMeta>())            
+                if (file.Type == FileType.FILE)
+                    DownloadFile(file.Name);
         }
     }
 }

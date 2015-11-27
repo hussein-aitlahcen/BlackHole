@@ -12,6 +12,6 @@ namespace BlackHole.Master
     /// </summary>
     public interface ISlaveWindow : IEventListener<SlaveEvent, Slave>
     {
-        int SlaveId { get; }
+        Slave Slave { get; }
     }
 }

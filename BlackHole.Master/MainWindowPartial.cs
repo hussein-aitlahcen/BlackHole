@@ -84,7 +84,7 @@ namespace BlackHole.Master
                     case SlaveEventType.INCOMMING_MESSAGE:
                         if(!(ev.Data is PongMessage))
                         {
-                            AddInfoMessage($"received slave={ev.Source.UserName} message={ev.Data.GetType().Name}");
+                            AddInfoMessage($"received id={ev.Source.Id} slave={ev.Source.UserName} message={ev.Data.GetType().Name}");
                         }
                         break;
                 }

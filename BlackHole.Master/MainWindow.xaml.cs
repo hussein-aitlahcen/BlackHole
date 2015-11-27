@@ -94,7 +94,7 @@ namespace BlackHole.Master
             // focus the existing window
             var existingWindow = m_childWindows
                 .OfType<ISlaveWindow>()
-                .FirstOrDefault(w => (w.SlaveId == slaveWindow.SlaveId) && (w.GetType() == slaveWindow.GetType()));
+                .FirstOrDefault(w => (w.Slave.Id == slaveWindow.Slave.Id) && (w.GetType() == slaveWindow.GetType()));
             if (existingWindow != null)
             {
                 var w = existingWindow as Window;
@@ -113,7 +113,7 @@ namespace BlackHole.Master
             };
 
             // register the slave window to the events of the slave
-            Slave.SlaveEvents.Subscribe((ev) => ev.Source.Id == slaveWindow.SlaveId, slaveWindow);
+            Slave.SlaveEvents.Subscribe((ev) => ev.Source.Id == slaveWindow.Slave.Id, slaveWindow);
                       
             m_childWindows.Add(window);
 
