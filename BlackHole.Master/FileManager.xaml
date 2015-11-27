@@ -1,0 +1,96 @@
+﻿<Window x:Class="BlackHole.Master.FileManager"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BlackHole.Master"
+        mc:Ignorable="d"
+        Title="FileManager" Height="600" Width="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <GroupBox Header="Current directory" Grid.Row="0" Margin="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400" />
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBox Name="TxtBoxDirectory" Text=".." Grid.Column="0" />
+                <Button Name="BtnNavigate" Content="Navigate" Click="OnNavigate" Grid.Column="2" />
+            </Grid>
+        </GroupBox>
+        <ListView Name="FilesList" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Row="1">
+            <ListView.Resources>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Type}" Value="Folder">
+                            <Setter Property="Foreground" Value="DarkGreen" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                    <EventSetter Event="MouseDoubleClick" Handler="OnFolderDoubleClick" />
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" Width="400" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Size" Width="100" DisplayMemberBinding="{Binding Size}" />
+                </GridView>
+            </ListView.View>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                </ContextMenu>
+            </ListView.ContextMenu>
+        </ListView>
+        <StatusBar Name="TargetStatusBar" Margin="10" BorderThickness="1" BorderBrush="Black" Background="White" Grid.Row="3">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Grid.Column="0">
+                <Label Name="TargetIp" Content="{Binding Ip}" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem Grid.Column="2">
+                <Label Name="TargetId" Content="{Binding Id}" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="3" />
+            <StatusBarItem Grid.Column="4">
+                <Label Name="TargetMachineName" Content="{Binding MachineName}" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="5" />
+            <StatusBarItem Grid.Column="6">
+                <Label Name="TargetUserName" Content="{Binding UserName}" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="7" />
+            <StatusBarItem Grid.Column="8">
+                <Label Name="TargetStatus" Content="Stable">
+                    <Label.ToolTip>
+                        <ToolTip Name="TargetStatusTooltip" Placement="Top" ToolTipService.ShowDuration="5">
+                            <StackPanel>
+                                <TextBlock Name="TargetStatusTooltipTitle" FontWeight="Bold">Nothing</TextBlock>
+                                <TextBlock Name="TargetStatusTooltipMessage">Nothing</TextBlock>
+                            </StackPanel>
+                        </ToolTip>
+                    </Label.ToolTip>
+                </Label>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
