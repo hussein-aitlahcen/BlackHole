@@ -100,6 +100,24 @@ namespace BlackHole.Master.Model
         /// 
         /// </summary>
         /// <param name="downloadedPart"></param>
-        public abstract void OnPartDownloaded(DownloadedFilePartMessage downloadedPart);
+        public void UpdateTransaction(DownloadedFilePartMessage downloadedPart)
+        {
+            if (downloadedPart == null)
+                return;
+
+            if (downloadedPart.Id != Id)
+                return;
+            
+            Completed = downloadedPart.CurrentPart == downloadedPart.TotalPart;
+            UpdateProgression(downloadedPart.CurrentPart, downloadedPart.TotalPart);
+
+            InternalUpdate(downloadedPart);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="downloadedPart"></param>
+        protected virtual void InternalUpdate(DownloadedFilePartMessage downloadedPart) { }
     }
 }

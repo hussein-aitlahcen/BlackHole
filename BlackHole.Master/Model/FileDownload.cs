@@ -42,17 +42,7 @@ namespace BlackHole.Master.Model
         /// 
         /// </summary>
         /// <param name="part"></param>
-        public override void OnPartDownloaded(DownloadedFilePartMessage downloadedPart)
-        {
-            if (downloadedPart == null)
-                return;
-
-            if (downloadedPart.Id != Id)
-                return;
-
-            RawFile.AddRange(downloadedPart.RawPart);
-            Completed = downloadedPart.CurrentPart == downloadedPart.TotalPart;
-            UpdateProgression(downloadedPart.CurrentPart, downloadedPart.TotalPart);
-        }
+        protected override void InternalUpdate(DownloadedFilePartMessage downloadedPart) 
+            => RawFile.AddRange(downloadedPart.RawPart);
     }
 }

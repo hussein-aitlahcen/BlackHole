@@ -19,21 +19,5 @@ namespace BlackHole.Master.Model
         public FileUpload() : base(TransactionType.UPLOAD)
         {
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="part"></param>
-        public override void OnPartDownloaded(DownloadedFilePartMessage downloadedPart)
-        {
-            if (downloadedPart == null)
-                return;
-
-            if (downloadedPart.Id != Id)
-                return;
-            
-            Completed = downloadedPart.CurrentPart == downloadedPart.TotalPart;
-            UpdateProgression(downloadedPart.CurrentPart, downloadedPart.TotalPart);
-        }
     }
 }

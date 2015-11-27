@@ -1,5 +1,6 @@
 ﻿using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
+using BlackHole.Master.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public ViewModel<Slave> ViewModelSlaves
+        public ViewModelCollection<Slave> ViewModelSlaves
         {
             get;
             private set;
@@ -29,7 +30,7 @@ namespace BlackHole.Master
         /// </summary>
         private void Initialize()
         {
-            SlavesList.DataContext = ViewModelSlaves = new ViewModel<Slave>();
+            SlavesList.DataContext = ViewModelSlaves = new ViewModelCollection<Slave>();
 
             Slave.SlaveEvents.Subscribe(this);
             NetworkService.Instance.Start();
@@ -79,7 +80,9 @@ namespace BlackHole.Master
                         break;
                     case SlaveEventType.DISCONNECTED:
                         ViewModelSlaves.Items.Remove(ev.Source);
+                        CloseSlaveWindows(ev.Source.Id);
                         AddInfoMessage($"disconnected slave={ev.Source.ToString()}");
+
                         break;
                     case SlaveEventType.INCOMMING_MESSAGE:
                         if(!(ev.Data is PongMessage))

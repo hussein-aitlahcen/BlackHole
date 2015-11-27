@@ -15,21 +15,23 @@ namespace BlackHole.Common
         static string IPIFY = "https://api.ipify.org/";
 
         /// <summary>
+        /// Wrapper method to simplify such operation.
+        /// First, it try to retrieve the object from the "operation" function.
+        /// If it suceed, the returned object is passed to the "onSuccess" function, else, the Exception is given to the "onError" function.
         /// 
         /// </summary>
-        /// <param name="name"></param>
         /// <param name="fun"></param>
-        /// <param name="success"></param>
-        /// <param name="error"></param>
-        public static void ExecuteComplexOperation<T>(string name, Func<T> operation, Action<T> success, Action<Exception> error)
+        /// <param name="onSuccess"></param>
+        /// <param name="onError"></param>
+        public static void ExecuteComplexOperation<T>(Func<T> operation, Action<T> onSuccess, Action<Exception> onError)
         {
             try
             {
-                success(operation());
+                onSuccess(operation());
             }
             catch (Exception e)
             {
-                error(e);
+                onError(e);
             }
         }
 

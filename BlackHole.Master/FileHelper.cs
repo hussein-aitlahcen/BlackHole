@@ -31,7 +31,6 @@ namespace BlackHole.Master
         {
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
-
             File.WriteAllBytes(Path.Combine("./", Path.Combine(directory, name)), raw);
         }
     }

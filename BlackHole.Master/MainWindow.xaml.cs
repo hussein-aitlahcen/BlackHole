@@ -83,6 +83,26 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="slaveId"></param>
+        private List<Window> FindSlaveWindows(int slaveId)
+        {
+            var windows = new List<Window>();
+            foreach (var window in m_childWindows.OfType<ISlaveWindow>())
+                if (window.Slave.Id == slaveId)
+                    windows.Add((Window)window);
+            return windows;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="slave"></param>
+        private void CloseSlaveWindows(int slaveId)
+           => FindSlaveWindows(slaveId).ForEach(async window => await window.ExecuteInDispatcher(() => window.Close()));
+        
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="window"></param>
         private async void RegisterOrOpenChildWindow(Window window)
         {

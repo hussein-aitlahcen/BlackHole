@@ -1,16 +1,17 @@
-﻿using System;
+﻿using BlackHole.Master.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlackHole.Master
+namespace BlackHole.Master.Model
 {
     /// <summary>
     /// 
     /// </summary>
-    public sealed class ViewModel<T>
+    public sealed class ViewModelCollection<T>
     {
         /// <summary>
         /// 
@@ -24,7 +25,7 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public ViewModel()
+        public ViewModelCollection()
         {
             Items = new ObservableCollection<T>();
         }

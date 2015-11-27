@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlackHole.Master"
         mc:Ignorable="d"
-        Title="FileManager" Height="800" Width="600">
+        Title="FileManager" Height="800" Width="700">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -47,7 +47,7 @@
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
-        <ListView Name="DownloadsList" Height="200" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Row="2">
+        <ListView Name="FileTransactionsList" Height="200" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Row="2">
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Style.Triggers>
@@ -85,6 +85,8 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
@@ -106,6 +108,10 @@
             </StatusBarItem>
             <Separator Grid.Column="7" />
             <StatusBarItem Grid.Column="8">
+                <Label Name="TotalTransaction" Content="Total transactions : 0" Foreground="DarkGreen" />                
+            </StatusBarItem>
+            <Separator Grid.Column="9" />
+            <StatusBarItem Grid.Column="10">
                 <Label Name="TargetStatus" Content="Stable" FontWeight="ExtraBold">
                     <Label.ToolTip>
                         <ToolTip Name="TargetStatusTooltip" Placement="Top" ToolTipService.ShowDuration="5">

@@ -69,13 +69,13 @@
     </Compile>
     <Compile Include="FileManagerPartial.cs" />
     <Compile Include="ISlaveWindow.cs" />
-    <Compile Include="MainWindowPartial.cs" />
+    <Compile Include="MainWindowPartial.cs"/>
     <Compile Include="Model\FileDownload.cs" />
     <Compile Include="Model\FileTransaction.cs" />
     <Compile Include="Model\FileUpload.cs" />
     <Compile Include="Model\ViewModel.cs" />
     <Compile Include="Slave.cs" />
-    <Compile Include="ViewModel.cs" />
+    <Compile Include="Model\ViewModelCollection.cs" />
     <Compile Include="WindowExtensions.cs" />
     <Page Include="FileManager.xaml">
       <SubType>Designer</SubType>

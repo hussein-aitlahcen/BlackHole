@@ -135,7 +135,7 @@ namespace BlackHole.Slave
         /// <param name="operation"></param>
         /// <param name="success"></param>
         private void ExecuteComplexSendOperation<T>(string name, Func<T> operation, Action<T> success) where T : NetMessage
-            => Utility.ExecuteComplexOperation(name, operation, (message) =>
+            => Utility.ExecuteComplexOperation(operation, (message) =>
             {
                 Send(message);
                 success(message);

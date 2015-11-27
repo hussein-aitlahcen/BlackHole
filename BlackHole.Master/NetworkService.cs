@@ -74,7 +74,7 @@ namespace BlackHole.Master
         {
             return m_server.TrySendMultipartMessage(message);
         }
-
+    
         /// <summary>
         /// 
         /// </summary>
