@@ -2,6 +2,11 @@
 C# RAT (Remote Adminitration Tool)
 For study purpose only :)
 
+# Technologies
+- protobuf-net -> message serialization/deserialization in slave<->master protocol
+- NetMQ -> network library used for the slave<->master system (client<->server)
+- Lz4.Net -> compression library
+- 
 # Working feature(s)
 - Reverse connection (extremly simple)
 - Slaves management (connection/disconnection)
@@ -13,7 +18,3 @@ For study purpose only :)
 - Trojan persistence
 - Reverse connection (fully working, slaves connecting to multiple masters etc...)
 
-# Technologies
-- protobuf-net -> message serialization/deserialization in slave<->master protocol
-- NetMQ -> network library used for the slave<->master system (client<->server)
-- Lz4.Net -> compression library
