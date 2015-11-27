@@ -11,7 +11,7 @@ For study purpose only :)
 - Reverse connection (extremly simple)
 - Slaves management (connection/disconnection)
 - Remote file browser
-- Remove file downloader
+- Remote file downloader
 
 # Next..
 - Remote file upload (almost done)
