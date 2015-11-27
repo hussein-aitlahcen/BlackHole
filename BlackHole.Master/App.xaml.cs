@@ -16,6 +16,9 @@ namespace BlackHole.Master
         public App()
         {
             Startup += new StartupEventHandler(App_Startup);
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+            };
         }
 
         void App_Startup(object sender, StartupEventArgs e)
