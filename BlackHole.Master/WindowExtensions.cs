@@ -34,7 +34,7 @@ namespace BlackHole.Master
         /// <param name="action"></param>
         public static async Task ExecuteInDispatcher(this Window window, Action action)
         {
-            await window.Dispatcher.InvokeAsync(action);
+            await window.Dispatcher.InvokeAsync(action, DispatcherPriority.ContextIdle);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace BlackHole.Master
         public static async Task DelayInvoke(this Dispatcher dispatcher, TimeSpan delay, Action action, CancellationToken cancellationToken)
         {
             await Task.Delay(delay);
-            await dispatcher.InvokeAsync(action, DispatcherPriority.Background, cancellationToken);
+            await dispatcher.InvokeAsync(action, DispatcherPriority.ApplicationIdle, cancellationToken);
         }
     }
 }
