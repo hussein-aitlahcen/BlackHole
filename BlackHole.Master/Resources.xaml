@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:BlackHole.Master">
-    <Image x:Key="FileManagerIcon" Source="Resources/icons/light/appbar.cabinet.files.variant.png" Width="25" Height="25" />
-    <Image x:Key="DownloadFileIcon" Source="Resources/icons/light/appbar.page.download.png" Width="25" Height="25" />
+    <Image x:Key="FileManagerIcon" Source="Resources/icons/light/appbar.cabinet.files.variant.png" Width="20" Height="20" />
+    <Image x:Key="DownloadFileIcon" Source="Resources/icons/light/appbar.page.download.png" Width="20" Height="20" />
 </ResourceDictionary>
     
