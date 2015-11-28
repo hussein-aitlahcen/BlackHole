@@ -21,7 +21,7 @@ namespace BlackHole.Slave
         /// <param name="currentPart"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static DownloadedFilePartMessage DownloadFilePart(int id, int currentPart, string path)
+        public static DownloadedFilePartMessage DownloadFilePart(int id, long currentPart, string path)
             => CommonHelper.DownloadFilePart(id, currentPart, path);
 
         /// <summary>

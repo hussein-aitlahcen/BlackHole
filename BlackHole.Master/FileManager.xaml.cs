@@ -1,4 +1,5 @@
 ﻿using BlackHole.Common.Network.Protocol;
+using BlackHole.Master.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,12 +60,36 @@ namespace BlackHole.Master
         /// <param name="e"></param>
         private void OnDownloadFile(object sender, RoutedEventArgs e)
         {
-            if (FilesList.SelectedItems.Count == 0)
+            ExecuteOnSelectedItems<FileMeta>(FilesList, (meta) =>
+            {
+                if (meta.Type == FileType.FILE)
+                    DownloadFile(meta.Name);
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnCancelTransaction(object sender, RoutedEventArgs e)
+        {
+            ExecuteOnSelectedItems<FileTransaction>(FileTransactionsList, (transaction) => ViewModelFileTransactions.Items.Remove(transaction));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objects"></param>
+        /// <param name="action"></param>
+        private void ExecuteOnSelectedItems<T>(ListView listView, Action<T> action)
+        {
+            if (listView.SelectedItems.Count == 0)
                 return;
 
-            foreach(var file in FilesList.SelectedItems.OfType<FileMeta>())            
-                if (file.Type == FileType.FILE)
-                    DownloadFile(file.Name);
+            foreach (var item in listView.SelectedItems.OfType<T>().ToArray())
+                action(item);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace BlackHole.Master.Model
         /// <summary>
         /// 
         /// </summary>
-        public int Progress
+        public long Progress
         {
             get { return m_progress; }
             set
@@ -78,7 +78,7 @@ namespace BlackHole.Master.Model
         /// <summary>
         /// 
         /// </summary>
-        private int m_progress;
+        private long m_progress;
 
         /// <summary>
         /// 
@@ -94,7 +94,7 @@ namespace BlackHole.Master.Model
         /// </summary>
         /// <param name="current"></param>
         /// <param name="maximum"></param>
-        public void UpdateProgression(int current, int maximum) => Progress = ((current + 1) * 100) / Math.Max(maximum, 1);
+        public void UpdateProgression(long current, long maximum) => Progress = ((current + 1) * 100) / Math.Max(maximum, 1);
 
         /// <summary>
         /// 

@@ -68,7 +68,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        public async void OnEvent(SlaveEvent ev)
+        public async Task OnEvent(SlaveEvent ev)
         {
             await this.ExecuteInDispatcher(() =>
             {

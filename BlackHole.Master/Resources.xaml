@@ -3,5 +3,6 @@
                     xmlns:local="clr-namespace:BlackHole.Master">
     <Image x:Key="FileManagerIcon" Source="Resources/icons/light/appbar.cabinet.files.variant.png" Width="20" Height="20" />
     <Image x:Key="DownloadFileIcon" Source="Resources/icons/light/appbar.page.download.png" Width="20" Height="20" />
+    <Image x:Key="CancelTransactionIcon" Source="Resources/icons/light/appbar.cancel.png" Width="20" Height="20" />    
 </ResourceDictionary>
     

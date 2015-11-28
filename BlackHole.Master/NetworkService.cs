@@ -15,7 +15,7 @@ namespace BlackHole.Master
     /// </summary>
     public sealed class NetworkService : Singleton<NetworkService>, IEventListener<SlaveEvent, Slave>
     {
-        public const int SEND_INTERVAL = 20;
+        public const int SEND_INTERVAL = 10;
         public const int PING_INTERVAL = 1000;
 
         public const int PING_COUNT_BEFORE_DISCONNECTION = 5;
@@ -54,7 +54,7 @@ namespace BlackHole.Master
             sendTimer.Elapsed += SendQueue;
 
             m_poller = new Poller();
-            m_poller.PollTimeout = 10;
+            m_poller.PollTimeout = 5;
             m_poller.AddSocket(m_server);
             m_poller.AddTimer(heartbeatTimer);
             m_poller.AddTimer(sendTimer);
@@ -182,7 +182,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        public void OnEvent(SlaveEvent ev)
+        public async Task OnEvent(SlaveEvent ev)
         {
             switch ((SlaveEventType)ev.EventType)
             {

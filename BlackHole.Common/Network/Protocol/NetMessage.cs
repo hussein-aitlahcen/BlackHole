@@ -17,8 +17,8 @@ namespace BlackHole.Common.Network.Protocol
     {
         public int Id { get; set; }
         public string Path { get; set; }
-        public int TotalPart { get; set; }
-        public int CurrentPart { get; set; }
+        public long TotalPart { get; set; }
+        public long CurrentPart { get; set; }
         public byte[] RawPart { get; set; }
     }
 
@@ -26,7 +26,7 @@ namespace BlackHole.Common.Network.Protocol
     public sealed class DownloadFilePartMessage : NetMessage
     {
         public int Id { get; set; }
-        public int CurrentPart { get; set; }
+        public long CurrentPart { get; set; }
         public string Path { get; set; }
     }   
      

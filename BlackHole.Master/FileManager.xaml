@@ -60,16 +60,21 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Id}" />
-                    <GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Header="Progession" Width="300" >
+                    <GridViewColumn Header="File" Width="250" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Progession" Width="350" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="280" Height="15"/>
+                                <ProgressBar Maximum="100" Value="{Binding Progress}" Width="280" Height="18" Margin="5"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Cancel transaction" Click="OnCancelTransaction" Icon="{StaticResource CancelTransactionIcon}" />
+                </ContextMenu>
+            </ListView.ContextMenu>
         </ListView>
         <StatusBar Name="TargetStatusBar" Margin="10" BorderThickness="1" BorderBrush="Black" Background="White" Grid.Row="3">
             <StatusBar.ItemsPanel>

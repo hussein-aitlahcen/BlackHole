@@ -20,13 +20,13 @@ namespace BlackHole.Common
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static DownloadedFilePartMessage DownloadFilePart(int id, int currentPart, string path)
+        public static DownloadedFilePartMessage DownloadFilePart(int id, long currentPart, string path)
         {
             path = Path.GetFullPath(path);
 
             using (var stream = new FileStream(path, FileMode.Open))
             {
-                int totalPart = (int)stream.Length / FILE_PART_SIZE;
+                var totalPart = stream.Length / FILE_PART_SIZE;
 
                 var partSize = currentPart != totalPart ? FILE_PART_SIZE : stream.Length - (FILE_PART_SIZE * currentPart);
                 // read only one chunck

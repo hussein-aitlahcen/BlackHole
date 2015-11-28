@@ -13,7 +13,7 @@ namespace BlackHole.Common
     public interface IEventListener<TEvent, TSource>
         where TEvent : Event<TSource>
     {
-        void OnEvent(TEvent ev);
+        Task OnEvent(TEvent ev);
     }
 
     /// <summary>
@@ -96,6 +96,6 @@ namespace BlackHole.Common
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        public void PostEvent(TEvent ev) => m_subscriber.ForEach(s => { if (s.Guard(ev)) s.Listener.OnEvent(ev); } );        
+        public void PostEvent(TEvent ev) => m_subscriber.ForEach(async s => { if (s.Guard(ev)) await s.Listener.OnEvent(ev); } );        
     }
 }
