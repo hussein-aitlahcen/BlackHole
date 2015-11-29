@@ -167,7 +167,6 @@ namespace BlackHole.Master
                                     // on finished, flush the file into the local directory
                                     (download) =>
                                     {
-                                        var raw = download.RawFile.ToArray();
                                         Slave.SaveDownloadedFile(download.Name, raw);
                                         Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_DOWNLOADED, Slave, raw));
                                         FinishDownloading();

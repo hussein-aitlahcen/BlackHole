@@ -18,24 +18,9 @@ namespace BlackHole.Master.Model
         /// <summary>
         /// 
         /// </summary>
-        public const int BUFFER_INITIAL_CAPACITY = 1024;
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<byte> RawFile
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="id"></param>
         public FileDownload() : base(TransactionType.DOWNLOAD)
         {            
-            RawFile = new List<byte>(BUFFER_INITIAL_CAPACITY);
         }
 
         /// <summary>
@@ -43,6 +28,6 @@ namespace BlackHole.Master.Model
         /// </summary>
         /// <param name="part"></param>
         protected override void InternalUpdate(DownloadedFilePartMessage downloadedPart) 
-            => RawFile.AddRange(downloadedPart.RawPart);
+            => CommonHelper.WriteDownloadedPart(downloadedPart);
     }
 }

@@ -44,5 +44,20 @@ namespace BlackHole.Common
                 };
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="part"></param>
+        public static void WriteDownloadedPart(DownloadedFilePartMessage part)
+        {
+            var existing = File.Exists(part.Path);
+            // output the part to local file
+            using(var stream = new FileStream(part.Path, FileMode.OpenOrCreate))
+            {
+                stream.Seek(FILE_PART_SIZE * part.CurrentPart, SeekOrigin.Begin);
+                stream.Write(part.RawPart, 0, FILE_PART_SIZE);
+            }
+        }
     }
 }
