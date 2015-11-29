@@ -245,8 +245,7 @@ namespace BlackHole.Master
                 onContinue(model);
                 return;
             }
-
-
+            
             onCompleted(model);
 
             TotalTransaction.Content = "Total transactions : " + ++m_sucessfulTransactions;
@@ -292,8 +291,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private T FindFileTransaction<T>(DownloadedFilePartMessage part)
-            where T : FileTransaction
+        private T FindFileTransaction<T>(DownloadedFilePartMessage part) where T : FileTransaction
             => ViewModelFileTransactions.Items.OfType<T>().FirstOrDefault(mod => mod.Id == part.Id);
     }
 }
