@@ -50,7 +50,7 @@ namespace BlackHole.Master
         {
             Slave = slave;
             m_pendingCommands = new Queue<IRemoteCommand>();
-            ViewModelCommands = new ViewModelCollection<IRemoteCommand>(this);            
+            ViewModelCommands = new ViewModelCollection<IRemoteCommand>();            
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="ev"></param>
         /// <returns></returns>
-        public virtual async Task OnEvent(SlaveEvent ev)
+        public virtual async void OnEvent(SlaveEvent ev)
         {
             await this.ExecuteInDispatcher(() =>
             {

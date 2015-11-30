@@ -53,7 +53,7 @@ namespace BlackHole.Master
         /// </summary>
         private void Initialize()
         {
-            SlavesList.DataContext = ViewModelSlaves = new ViewModelCollection<Slave>(this);
+            SlavesList.DataContext = ViewModelSlaves = new ViewModelCollection<Slave>();
 
             Slave.SlaveEvents.Subscribe(this);
             NetworkService.Instance.Start();
@@ -91,7 +91,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        public async Task OnEvent(SlaveEvent ev)
+        public async void OnEvent(SlaveEvent ev)
         {
             await this.ExecuteInDispatcher(() =>
             {

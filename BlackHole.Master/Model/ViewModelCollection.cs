@@ -27,7 +27,7 @@ namespace BlackHole.Master.Model
         /// <summary>
         /// 
         /// </summary>
-        public ViewModelCollection(Window window)
+        public ViewModelCollection()
         {
             Items = new ObservableCollection<T>();
         }

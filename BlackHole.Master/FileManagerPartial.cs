@@ -46,7 +46,7 @@ namespace BlackHole.Master
 
             TargetStatusBar.DataContext = slave;
             FileTransactionsList.DataContext = ViewModelCommands;
-            FilesList.DataContext = ViewModelFiles = new ViewModelCollection<FileMeta>(this);
+            FilesList.DataContext = ViewModelFiles = new ViewModelCollection<FileMeta>();
         }
 
         /// <summary>
@@ -248,9 +248,9 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        public override async Task OnEvent(SlaveEvent ev)
+        public override async void OnEvent(SlaveEvent ev)
         {
-            await base.OnEvent(ev);
+            base.OnEvent(ev);
             await this.ExecuteInDispatcher(() =>
             {
                 switch((SlaveEventType)ev.EventType)

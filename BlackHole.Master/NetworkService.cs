@@ -111,8 +111,10 @@ namespace BlackHole.Master
             foreach(var slave in m_slaveById.Values.ToArray())
             {
                 slave.PingAndIncrementTimeout();
-                if(slave.PingTimeout > PING_COUNT_BEFORE_DISCONNECTION)                
-                    FireSlaveDisconnected(slave);                
+                if (slave.PingTimeout > PING_COUNT_BEFORE_DISCONNECTION)
+                {
+                    FireSlaveDisconnected(slave);
+                } 
             }
         }
         
@@ -182,7 +184,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        public async Task OnEvent(SlaveEvent ev)
+        public void OnEvent(SlaveEvent ev)
         {
             switch ((SlaveEventType)ev.EventType)
             {

