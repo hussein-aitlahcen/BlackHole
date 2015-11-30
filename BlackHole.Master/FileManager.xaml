@@ -10,6 +10,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -17,7 +18,7 @@
         <GroupBox Header="Current directory" Grid.Row="0" Margin="10">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="400" />
+                    <ColumnDefinition Width="600" />
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -25,13 +26,27 @@
                 <Button Name="BtnNavigate" Content="Navigate" Click="OnNavigate" Grid.Column="2" />
             </Grid>
         </GroupBox>
-        <ListView Name="FilesList" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Row="1">
+        <GroupBox Header="Upload file to current directory" Grid.Row="1" Margin="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="600" />
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBox Name="TxtBoxUpload" Text="http://example.com/script.bat" Grid.Column="0" />
+                <Button Name="BtnUpload" Content="Upload" Click="OnUpload" Grid.Column="2" />
+            </Grid>
+        </GroupBox>
+        <ListView Grid.Row="2" Name="FilesList" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible">
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Type}" Value="Folder">
                             <Setter Property="Foreground" Value="DarkGreen" />
                         </DataTrigger>
+                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                            <BeginStoryboard Storyboard="{StaticResource HighlightEffect}" />
+                        </EventTrigger>
                     </Style.Triggers>
                     <EventSetter Event="MouseDoubleClick" Handler="OnFolderDoubleClick" />
                 </Style>
@@ -45,10 +60,11 @@
             <ListView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Download file" Click="OnDownloadFile" Icon="{StaticResource DownloadFileIcon}" />
+                    <MenuItem Header="Deleted file" Click="OnDeleteFile" Icon="{StaticResource DeleteFileIcon}" />
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
-        <ListView Name="FileTransactionsList" Height="200" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Row="2">
+        <ListView Grid.Row="3" Name="FileTransactionsList" Height="200" ItemsSource="{Binding Items}" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible">
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Style.Triggers>
@@ -56,6 +72,7 @@
                             <Setter Property="Background" Value="Beige" />
                         </DataTrigger>
                     </Style.Triggers>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
             </ListView.Resources>
             <ListView.View>
@@ -66,7 +83,7 @@
                     <GridViewColumn Header="Progession" Width="400" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ProgressBar Maximum="100" Foreground="{Binding ProgressColor}" Value="{Binding Progress}" Width="380" Height="18" Margin="5"/>
+                                <ProgressBar Maximum="100" Foreground="{Binding ProgressColor}" Value="{Binding Progress}" Height="18" Margin="5"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -78,7 +95,7 @@
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>
-        <StatusBar Name="TargetStatusBar" Margin="10" BorderThickness="1" BorderBrush="Black" Background="White" Grid.Row="3">
+        <StatusBar Grid.Row="4" Name="TargetStatusBar" Margin="10" BorderThickness="1" BorderBrush="Black" Background="White">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid>

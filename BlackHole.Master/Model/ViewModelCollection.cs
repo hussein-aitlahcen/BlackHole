@@ -5,6 +5,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media.Animation;
 
 namespace BlackHole.Master.Model
 {
@@ -21,11 +23,11 @@ namespace BlackHole.Master.Model
             get;
             set;
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
-        public ViewModelCollection()
+        public ViewModelCollection(Window window)
         {
             Items = new ObservableCollection<T>();
         }

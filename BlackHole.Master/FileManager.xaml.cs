@@ -28,6 +28,6 @@ namespace BlackHole.Master
         public FileManager()
         {
             InitializeComponent();      
-        }        
+        }
     }
 }

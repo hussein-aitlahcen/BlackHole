@@ -53,7 +53,7 @@ namespace BlackHole.Master
         /// </summary>
         private void Initialize()
         {
-            SlavesList.DataContext = ViewModelSlaves = new ViewModelCollection<Slave>();
+            SlavesList.DataContext = ViewModelSlaves = new ViewModelCollection<Slave>(this);
 
             Slave.SlaveEvents.Subscribe(this);
             NetworkService.Instance.Start();

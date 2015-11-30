@@ -50,7 +50,7 @@ namespace BlackHole.Master
         {
             Slave = slave;
             m_pendingCommands = new Queue<IRemoteCommand>();
-            ViewModelCommands = new ViewModelCollection<IRemoteCommand>();            
+            ViewModelCommands = new ViewModelCollection<IRemoteCommand>(this);            
         }
 
         /// <summary>

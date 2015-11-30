@@ -3,6 +3,31 @@
                     xmlns:local="clr-namespace:BlackHole.Master">
     <Image x:Key="FileManagerIcon" Source="Resources/icons/light/appbar.cabinet.files.variant.png" Width="20" Height="20" />
     <Image x:Key="DownloadFileIcon" Source="Resources/icons/light/appbar.page.download.png" Width="20" Height="20" />
-    <Image x:Key="CancelTransactionIcon" Source="Resources/icons/light/appbar.cancel.png" Width="20" Height="20" />    
+    <Image x:Key="DeleteFileIcon" Source="Resources/icons/light/appbar.delete.png" Width="20" Height="20" />
+    <Image x:Key="CancelTransactionIcon" Source="Resources/icons/light/appbar.cancel.png" Width="20" Height="20" />
+    <Storyboard x:Key="HighlightEffect">
+        <ColorAnimation BeginTime="0:0:0"
+                  Duration="0:0:0.01"
+                  Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                  To="Yellow" />
+        <ColorAnimation BeginTime="0:0:0.01"
+                  Duration="0:0:1"
+                  Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                  To="Transparent" />
+    </Storyboard>
+    
+    <Storyboard x:Key="UnveiledEffect">
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                        Duration="00:00:02"
+                                                        From="0"
+                                                        To="1" />
+    </Storyboard>
+
+    <Storyboard x:Key="VeiledEffect">
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                            Duration="00:00:02"
+                                            From="1"
+                                            To="0" />
+    </Storyboard>
 </ResourceDictionary>
     

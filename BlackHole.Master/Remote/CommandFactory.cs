@@ -40,6 +40,18 @@ namespace BlackHole.Master.Remote
                         onCompleted, 
                         onFaulted);
 
+                case CommandType.UPLOAD:
+                    return new RemoteCommand<TIn>(
+                        NextCommandId,
+                        "Upload",
+                        slave,
+                        "Uploading...",
+                        targetText,
+                        onExecute,
+                        onContinue,
+                        onCompleted,
+                        onFaulted);
+
                 default:
                     return null;
             }

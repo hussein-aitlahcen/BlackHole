@@ -12,6 +12,36 @@ namespace BlackHole.Common.Network.Protocol
     // ===========================================
     // ================= Messages ================
     // ===========================================
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class FileDeletionMessage : NetMessage
+    {
+        public string FilePath { get; set; }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class DeleteFileMessage : NetMessage
+    {
+        public string FilePath { get; set; }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class UploadProgressMessage : NetMessage
+    {
+        public long Id { get; set; }
+        public string Uri { get; set; }
+        public string Path { get; set; }
+        public int Percentage { get; set; }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class UploadFileMessage : NetMessage
+    {
+        public long Id { get; set; }
+        public string Uri { get; set; }
+        public string Path { get; set; }
+    }
+
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class DownloadedFilePartMessage : NetMessage
     {
@@ -102,6 +132,10 @@ namespace BlackHole.Common.Network.Protocol
         public string Size { get; set; }
     }
 
+    [ProtoInclude(1012, typeof(FileDeletionMessage))]
+    [ProtoInclude(1011, typeof(DeleteFileMessage))]
+    [ProtoInclude(1010, typeof(UploadProgressMessage))]
+    [ProtoInclude(1009, typeof(UploadFileMessage))]
     [ProtoInclude(1008, typeof(DownloadedFilePartMessage))]
     [ProtoInclude(1007, typeof(DownloadFilePartMessage))]
     [ProtoInclude(1006, typeof(StatusUpdateMessage))]
