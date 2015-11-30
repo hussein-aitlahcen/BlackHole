@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlackHole.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,8 +19,8 @@ namespace BlackHole.Master
         /// <param name="slaveName"></param>
         /// <param name="fileName"></param>
         /// <param name="raw"></param>
-        public static void SaveDownloadedFile(string slaveName, string fileName, byte[] raw)
-            => SaveFile(slaveName, fileName, raw);
+        public static void WriteDownloadedPart(string directory, string fileName, long currentPart, byte[] rawData)
+            => CommonHelper.WriteDownloadedPart(directory, fileName, currentPart, rawData);
 
         /// <summary>
         /// 

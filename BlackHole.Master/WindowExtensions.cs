@@ -17,7 +17,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="window"></param>
         /// <param name="message"></param>
-        public static void Send(this ISlaveWindow window, NetMessage message) => window.Slave.Send(message);
+        public static void Send(this SlaveWindow window, NetMessage message) => window.Slave.Send(message);
 
         /// <summary>
         /// 

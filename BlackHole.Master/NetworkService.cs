@@ -54,7 +54,7 @@ namespace BlackHole.Master
             sendTimer.Elapsed += SendQueue;
 
             m_poller = new Poller();
-            m_poller.PollTimeout = 5;
+            m_poller.PollTimeout = 1;
             m_poller.AddSocket(m_server);
             m_poller.AddTimer(heartbeatTimer);
             m_poller.AddTimer(sendTimer);

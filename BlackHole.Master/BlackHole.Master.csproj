@@ -68,14 +68,14 @@
       <DependentUpon>FileManager.xaml</DependentUpon>
     </Compile>
     <Compile Include="FileManagerPartial.cs" />
-    <Compile Include="ISlaveWindow.cs" />
     <Compile Include="MainWindowPartial.cs" />
-    <Compile Include="Model\FileDownload.cs" />
-    <Compile Include="Model\FileTransaction.cs" />
-    <Compile Include="Model\FileUpload.cs" />
+    <Compile Include="Model\CommandModel.cs" />
     <Compile Include="Model\ViewModel.cs" />
+    <Compile Include="Remote\CommandFactory.cs" />
+    <Compile Include="Remote\RemoteCommand.cs" />
     <Compile Include="Slave.cs" />
     <Compile Include="Model\ViewModelCollection.cs" />
+    <Compile Include="SlaveWindow.cs" />
     <Compile Include="WindowExtensions.cs" />
     <Page Include="FileManager.xaml">
       <SubType>Designer</SubType>
@@ -1395,6 +1395,7 @@
     <Resource Include="Resources\icons\light\appbar.youtube.png" />
     <Resource Include="Resources\icons\light\appbar.zune.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

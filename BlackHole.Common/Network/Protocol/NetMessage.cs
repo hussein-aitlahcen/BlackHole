@@ -15,7 +15,7 @@ namespace BlackHole.Common.Network.Protocol
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class DownloadedFilePartMessage : NetMessage
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Path { get; set; }
         public long TotalPart { get; set; }
         public long CurrentPart { get; set; }
@@ -25,7 +25,7 @@ namespace BlackHole.Common.Network.Protocol
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class DownloadFilePartMessage : NetMessage
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public long CurrentPart { get; set; }
         public string Path { get; set; }
     }   
@@ -33,9 +33,15 @@ namespace BlackHole.Common.Network.Protocol
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class StatusUpdateMessage : NetMessage
     {
+        public long OperationId { get; set; }
         public string Operation { get; set; }
         public bool Success { get; set; }
         public string Message { get; set; }
+
+        public StatusUpdateMessage()
+        {
+            OperationId = -1;
+        }
     }
     
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]

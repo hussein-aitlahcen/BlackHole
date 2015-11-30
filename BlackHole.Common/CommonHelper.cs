@@ -20,7 +20,7 @@ namespace BlackHole.Common
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static DownloadedFilePartMessage DownloadFilePart(int id, long currentPart, string path)
+        public static DownloadedFilePartMessage DownloadFilePart(long id, long currentPart, string path)
         {
             path = Path.GetFullPath(path);
 
@@ -49,14 +49,15 @@ namespace BlackHole.Common
         /// 
         /// </summary>
         /// <param name="part"></param>
-        public static void WriteDownloadedPart(DownloadedFilePartMessage part)
+        public static void WriteDownloadedPart(string directory, string fileName, long currentPart, byte[] rawData)
         {
-            var existing = File.Exists(part.Path);
+            var path = Path.Combine(directory, Path.GetFileName(fileName));
+            var existing = File.Exists(path);
             // output the part to local file
-            using(var stream = new FileStream(part.Path, FileMode.OpenOrCreate))
+            using(var stream = new FileStream(path, FileMode.OpenOrCreate))
             {
-                stream.Seek(FILE_PART_SIZE * part.CurrentPart, SeekOrigin.Begin);
-                stream.Write(part.RawPart, 0, FILE_PART_SIZE);
+                stream.Seek(FILE_PART_SIZE * currentPart, SeekOrigin.Begin);
+                stream.Write(rawData, 0, rawData.Length);
             }
         }
     }

