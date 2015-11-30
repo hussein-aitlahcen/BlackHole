@@ -154,7 +154,7 @@ namespace BlackHole.Slave
                 .With<DeleteFileMessage>(DeleteFile)
                 .Default(m =>
                 {
-
+                    SendFailedStatus("Message parsing", $"Unknow message {m.GetType().Name}");
                 });
         }
 
@@ -172,6 +172,20 @@ namespace BlackHole.Slave
         /// <param name="operation"></param>
         /// <param name="message"></param>
         private void SendStatus(long operationId, string operation, string message) => SendStatus(operationId, operation, true, message);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="message"></param>
+        private void SendStatus(string operation, string message) => SendStatus(-1, operation, message);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="message"></param>
+        private void SendFailedStatus(string operation, string message) => SendStatus(-1, operation, false, message);
 
         /// <summary>
         /// 

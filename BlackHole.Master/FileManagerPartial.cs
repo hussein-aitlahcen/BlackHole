@@ -221,20 +221,36 @@ namespace BlackHole.Master
                 },
                 (download) => // continue
                 {
-                    FileHelper.WriteDownloadedPart(Slave.OutputDirectory, download.Path, download.CurrentPart, download.RawPart);
-                    this.Send(new DownloadFilePartMessage()
+                    try
                     {
-                        Id = download.Id,
-                        Path = download.Path,
-                        CurrentPart = download.CurrentPart + 1
-                    });
+                        FileHelper.WriteDownloadedPart(Slave.OutputDirectory, download.Path, download.CurrentPart, download.RawPart);
+                        
+                        this.Send(new DownloadFilePartMessage()
+                        {
+                            Id = download.Id,
+                            Path = download.Path,
+                            CurrentPart = download.CurrentPart + 1
+                        });
+                    }
+                    catch(Exception e)
+                    {
+                        FireFailedStatus(download.Id, "Downloading", e.Message);
+                    }
                 },
                 (download) => // complete
                 {
-                    TotalTransaction.Content = $"Successful transactions: {++m_sucessfulTransactions}/{m_totalTransactions}";
-                    FileHelper.WriteDownloadedPart(Slave.OutputDirectory, download.Path, download.CurrentPart, download.RawPart);
-                    Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_DOWNLOADED, Slave, Path.GetFileName(download.Path)));
-                    FinishCurrentCommand();
+                    try
+                    {
+                        FileHelper.WriteDownloadedPart(Slave.OutputDirectory, download.Path, download.CurrentPart, download.RawPart);
+
+                        TotalTransaction.Content = $"Successful transactions: {++m_sucessfulTransactions}/{m_totalTransactions}";
+                        Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_DOWNLOADED, Slave, Path.GetFileName(download.Path)));
+                        FinishCurrentCommand();
+                    }
+                    catch (Exception e)
+                    {
+                        FireFailedStatus(download.Id, "Downloading", e.Message);
+                    }
                 },
                 () => // fault
                 {

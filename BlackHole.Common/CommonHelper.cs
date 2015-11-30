@@ -54,7 +54,7 @@ namespace BlackHole.Common
             var path = Path.Combine(directory, Path.GetFileName(fileName));
             var existing = File.Exists(path);
             // output the part to local file
-            using(var stream = new FileStream(path, FileMode.OpenOrCreate))
+            using(var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
                 stream.Seek(FILE_PART_SIZE * currentPart, SeekOrigin.Begin);
                 stream.Write(rawData, 0, rawData.Length);

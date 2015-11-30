@@ -171,7 +171,41 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private bool IsCommandCancelled(long id) => !ViewModelCommands.Items.Any(command => command.Id == id);
+        protected bool IsCommandCancelled(long id) => !ViewModelCommands.Items.Any(command => command.Id == id);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operationId"></param>
+        /// <param name="operation"></param>
+        /// <param name="message"></param>
+        protected void FireSuccessStatus(long operationId, string operation, string message) =>
+            FireFakeStatus(operationId, operation, true, message);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operationId"></param>
+        /// <param name="operation"></param>
+        /// <param name="message"></param>
+        protected void FireFailedStatus(long operationId, string operation, string message) =>
+            FireFakeStatus(operationId, operation, false, message);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="operationId"></param>
+        /// <param name="operation"></param>
+        /// <param name="success"></param>
+        /// <param name="message"></param>
+        protected void FireFakeStatus(long operationId, string operation, bool success, string message) =>
+            Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.INCOMMING_MESSAGE, Slave, new StatusUpdateMessage()
+            {
+                OperationId = operationId,
+                Operation = operation,
+                Message = message,
+                Success = success
+            }));
 
         /// <summary>
         /// 

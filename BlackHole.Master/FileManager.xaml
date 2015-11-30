@@ -68,9 +68,6 @@
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Download}" Value="1">
-                            <Setter Property="Background" Value="Beige" />
-                        </DataTrigger>
                         <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                             <BeginStoryboard Storyboard="{StaticResource HighlightEffect}" />
                         </EventTrigger>
