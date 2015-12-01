@@ -14,8 +14,8 @@
             <ListView Name="SlavesList" ItemsSource="{Binding Items}"  Margin="10" Height="350" ScrollViewer.VerticalScrollBarVisibility="Visible">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Ip" Width="100" DisplayMemberBinding="{Binding Ip}" />
                         <GridViewColumn Header="Id" Width="100" DisplayMemberBinding="{Binding Id}" />
+                        <GridViewColumn Header="Ip" Width="100" DisplayMemberBinding="{Binding Ip}" />
                         <GridViewColumn Header="OperatingSystem" Width="300" DisplayMemberBinding="{Binding OperatingSystem}" />
                         <GridViewColumn Header="MachineName" Width="150" DisplayMemberBinding="{Binding MachineName}" />
                         <GridViewColumn Header="UserName" Width="150" DisplayMemberBinding="{Binding UserName}" />
