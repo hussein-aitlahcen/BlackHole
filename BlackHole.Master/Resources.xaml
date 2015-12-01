@@ -48,8 +48,6 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
@@ -71,10 +69,6 @@
             </StatusBarItem>
             <Separator Grid.Column="7" />
             <StatusBarItem Grid.Column="8">
-                <Label Name="TotalTransaction" Content="Total transactions : 0" Foreground="DarkGreen" />
-            </StatusBarItem>
-            <Separator Grid.Column="9" />
-            <StatusBarItem Grid.Column="10">
                 <Label Name="TargetStatus" Content="Stable" FontWeight="ExtraBold">
                     <Label.ToolTip>
                         <ToolTip Name="TargetStatusTooltip" Placement="Top" ToolTipService.ShowDuration="5">

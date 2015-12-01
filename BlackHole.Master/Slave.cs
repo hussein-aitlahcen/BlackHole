@@ -18,6 +18,7 @@ namespace BlackHole.Master
         CONNECTED,
         DISCONNECTED,
         INCOMMING_MESSAGE,
+        OUTGOING_MESSAGE,
         COMMAND_EXECUTED,
         COMMAND_CONTINUE,
         COMMAND_FAULTED,
@@ -155,8 +156,20 @@ namespace BlackHole.Master
             var frames = new NetMQMessage();
             frames.Append(Identity);
             frames.Append(message.Serialize());
+
+            FireSlaveOutgoingMessage(this, message);
+
             return NetworkService.Instance.Send(frames);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="slave"></param>
+        /// <param name="message"></param>
+        private void FireSlaveOutgoingMessage(Slave slave, NetMessage message)
+            => Slave.PostEvent(new SlaveEvent(SlaveEventType.OUTGOING_MESSAGE, slave, message));
+
 
         /// <summary>
         /// 

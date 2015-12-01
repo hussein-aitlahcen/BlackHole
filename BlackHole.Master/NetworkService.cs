@@ -143,10 +143,8 @@ namespace BlackHole.Master
         /// <param name="slave"></param>
         /// <param name="message"></param>
         private void FireSlaveIncommingMessage(Slave slave, NetMessage message)
-        {
-            Slave.PostEvent(new SlaveEvent(SlaveEventType.INCOMMING_MESSAGE, slave, message));
-        }
-
+            => Slave.PostEvent(new SlaveEvent(SlaveEventType.INCOMMING_MESSAGE, slave, message));
+        
         /// <summary>
         /// 
         /// </summary>
