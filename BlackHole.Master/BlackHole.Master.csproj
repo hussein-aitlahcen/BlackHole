@@ -45,6 +45,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -70,7 +71,12 @@
     <Compile Include="FileManagerPartial.cs" />
     <Compile Include="MainWindowPartial.cs" />
     <Compile Include="Model\CommandModel.cs" />
+    <Compile Include="Model\SlaveMonitorModel.cs" />
     <Compile Include="Model\ViewModel.cs" />
+    <Compile Include="RemoteDesktop.xaml.cs">
+      <DependentUpon>RemoteDesktop.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RemoteDesktopPartial.cs" />
     <Compile Include="Remote\CommandFactory.cs" />
     <Compile Include="Remote\RemoteCommand.cs" />
     <Compile Include="Slave.cs" />
@@ -93,6 +99,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="RemoteDesktop.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

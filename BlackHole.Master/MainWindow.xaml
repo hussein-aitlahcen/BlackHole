@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlackHole.Master"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1000">
+        Title="MainWindow" Height="700" Width="1000"
+        Loaded="OnLoaded"
+        Closing="OnClosing">
+    
     <Grid Background="Linen">
         <StackPanel>
             <ListView Name="SlavesList" ItemsSource="{Binding Items}"  Margin="10" Height="350" ScrollViewer.VerticalScrollBarVisibility="Visible">
@@ -21,22 +24,29 @@
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="FileManager" Click="OpenFileManager" Icon="{StaticResource FileManagerIcon}" />
+                        <MenuItem Header="RemoteDesktop" Click="OpenRemoteDesktop" Icon="{StaticResource RemoteDesktopIcon}" />
                     </ContextMenu>
                 </ListView.ContextMenu>
             </ListView>
-            <RichTextBox Name="Console" Margin="10 0 10 0" IsReadOnly="True" Height="250" ScrollViewer.VerticalScrollBarVisibility="Visible" />
-            <StatusBar Margin="10" BorderThickness="1" BorderBrush="Black" Background="White">
+            <RichTextBox Name="Console" Margin="10 0 10 0" IsReadOnly="True" Height="240" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+            <StatusBar Name="SlaveStatusBar" Margin="10" BorderThickness="1" BorderBrush="Black" Background="White">
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                         </Grid>
                     </ItemsPanelTemplate>
                 </StatusBar.ItemsPanel>
                 <StatusBarItem Grid.Column="0">
-                    <TextBlock Name="ListeningState" Text="Waiting for slaves.." />
+                    <Label Name="ListeningStateLbl" Content="{Binding ListeningState}" Foreground="Black" />
+                </StatusBarItem>
+                <Separator Grid.Column="1" />
+                <StatusBarItem Grid.Column="2">
+                    <Label Name="OnlineUsersLbl" Content="{Binding OnlineSlaves}" FontWeight="Bold" Foreground="DarkGreen" />
                 </StatusBarItem>
             </StatusBar>
         </StackPanel>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Animation;
 
 namespace BlackHole.Master.Model
@@ -30,6 +31,32 @@ namespace BlackHole.Master.Model
         public ViewModelCollection()
         {
             Items = new ObservableCollection<T>();
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        public void AddItem(T item)
+        {
+            Items.Add(item);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Clear()
+        {
+            Items.ToList().ForEach(RemoveItem);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="item"></param>
+        public void RemoveItem(T item)
+        {
+            Items.Remove(item);
         }
     }
 }

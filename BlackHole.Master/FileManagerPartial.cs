@@ -41,10 +41,9 @@ namespace BlackHole.Master
         public FileManager(Slave slave) : base(slave)
         {
             InitializeComponent();
-
+            
             Loaded += OnNavigate;
-
-            TargetStatusBar.DataContext = slave;
+            
             FileTransactionsList.DataContext = ViewModelCommands;
             FilesList.DataContext = ViewModelFiles = new ViewModelCollection<FileMeta>();
         }
@@ -187,7 +186,7 @@ namespace BlackHole.Master
                 },
                 (progress) =>
                 {
-                    Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_UPLOADED, Slave, fileName));
+                    FireSlaveEvent(SlaveEventType.FILE_UPLOADED, fileName);
                     FinishCurrentCommand();
                     NavigateToTypedFolder();
                 },
@@ -242,9 +241,8 @@ namespace BlackHole.Master
                     try
                     {
                         FileHelper.WriteDownloadedPart(Slave.OutputDirectory, download.Path, download.CurrentPart, download.RawPart);
-
-                        TotalTransaction.Content = $"Successful transactions: {++m_sucessfulTransactions}/{m_totalTransactions}";
-                        Slave.SlaveEvents.PostEvent(new SlaveEvent(SlaveEventType.FILE_DOWNLOADED, Slave, Path.GetFileName(download.Path)));
+                        //TotalTransaction.Content = $"Successful transactions: {++m_sucessfulTransactions}/{m_totalTransactions}";
+                        FireSlaveEvent(SlaveEventType.FILE_DOWNLOADED, Path.GetFileName(download.Path));
                         FinishCurrentCommand();
                     }
                     catch (Exception e)
@@ -259,6 +257,7 @@ namespace BlackHole.Master
 
             m_totalTransactions++;
         }
+
 
         /// <summary>
         /// 
@@ -278,16 +277,7 @@ namespace BlackHole.Master
                             {
                                 TxtBoxDirectory.Text = m.Path;
                                 ViewModelFiles.Items.Clear();
-                                m.Files.ForEach(ViewModelFiles.Items.Add);
-                            })
-                            .With<StatusUpdateMessage>(m =>
-                            {
-                                TargetStatus.Content = m.Operation;
-                                TargetStatusTooltipTitle.Text = m.Operation;
-                                TargetStatusTooltipMessage.Text = m.Message;
-                                TargetStatus.Foreground = m.Success ? Brushes.DarkGreen : Brushes.Red;
-                                TargetStatusTooltip.PlacementTarget = TargetStatus;
-                                TargetStatusTooltip.IsOpen = true;
+                                m.Files.ForEach(ViewModelFiles.AddItem);
                             })
                             .With<DownloadedFilePartMessage>(m =>
                             {
@@ -300,7 +290,7 @@ namespace BlackHole.Master
                             })
                             .With<UploadProgressMessage>(m =>
                             {
-                                // will be received when the slave downloaded the file
+                                // will be received when the slave download the file
                                 UpdateCommand(m,
                                     (command) =>
                                     {

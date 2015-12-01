@@ -13,6 +13,12 @@ namespace BlackHole.Master
     /// </summary>
     public partial class App : Application
     {
+        public static ResourceDictionary Resources
+        {
+            get;
+            private set;
+        }
+
         public App()
         {
             Startup += new StartupEventHandler(App_Startup);
@@ -23,6 +29,7 @@ namespace BlackHole.Master
 
         void App_Startup(object sender, StartupEventArgs e)
         {
+            Resources = Current.Resources.MergedDictionaries.First();
             Master.MainWindow.Instance.Show();
         }
     }

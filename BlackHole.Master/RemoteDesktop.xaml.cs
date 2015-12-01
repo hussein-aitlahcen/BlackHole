@@ -1,5 +1,4 @@
-﻿using BlackHole.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,20 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace BlackHole.Master
 {
     /// <summary>
-    /// Logique d'interaction pour MainWindow.xaml
+    /// Logique d'interaction pour RemoteDesktop.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class RemoteDesktop : SlaveWindow
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private MainWindow()
+        public RemoteDesktop()
         {
             InitializeComponent();
         }

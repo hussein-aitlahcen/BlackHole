@@ -12,6 +12,28 @@ namespace BlackHole.Common.Network.Protocol
     // ===========================================
     // ================= Messages ================
     // ===========================================
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class ScreenCaptureMessage : NetMessage
+    {
+        public int ScreenNumber { get; set; }
+        public int Quality { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public byte[] RawImage { get; set; }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class StopScreenCaptureMessage : NetMessage
+    {
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class StartScreenCaptureMessage : NetMessage
+    {
+        public int ScreenNumber { get; set; }
+        public int Quality { get; set; }
+        public int Rate { get; set; }
+    }
 
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class FileDeletionMessage : NetMessage
@@ -132,6 +154,9 @@ namespace BlackHole.Common.Network.Protocol
         public string Size { get; set; }
     }
 
+    [ProtoInclude(1015, typeof(StopScreenCaptureMessage))]
+    [ProtoInclude(1014, typeof(ScreenCaptureMessage))]
+    [ProtoInclude(1013, typeof(StartScreenCaptureMessage))]
     [ProtoInclude(1012, typeof(FileDeletionMessage))]
     [ProtoInclude(1011, typeof(DeleteFileMessage))]
     [ProtoInclude(1010, typeof(UploadProgressMessage))]

