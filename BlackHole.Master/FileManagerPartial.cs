@@ -76,12 +76,24 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void OnGoToDrives(object sender, RoutedEventArgs e) => NavigateToDrives();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnNavigate(object sender, RoutedEventArgs e) => NavigateToTypedFolder();
 
         /// <summary>
         /// 
         /// </summary>
         private void NavigateToTypedFolder() => NavigateToFolder(TxtBoxDirectory.Text);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void NavigateToDrives() => NavigateToFolder(string.Empty, true);
 
         /// <summary>
         /// 
@@ -141,9 +153,10 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="folder"></param>
-        private void NavigateToFolder(string folder) =>
+        private void NavigateToFolder(string folder, bool drives = false) =>
             this.Send(new NavigateToFolderMessage()
             {
+                Drives = drives,
                 Path = Path.Combine(TxtBoxDirectory.Text, folder)
             });      
         

@@ -283,7 +283,7 @@ namespace BlackHole.Slave
         private void NavigateToFolder(NavigateToFolderMessage message)
         {
             ExecuteSimpleOperation(message.WindowId, "Folder navigation", 
-                () => FileHelper.NavigateToFolder(message.Path), 
+                () => FileHelper.NavigateToFolder(message.Path, message.Drives), 
                 (nav) => $"{nav.Path}");
         }
 

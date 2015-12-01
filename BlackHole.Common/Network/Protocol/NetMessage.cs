@@ -106,6 +106,7 @@ namespace BlackHole.Common.Network.Protocol
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class NavigateToFolderMessage : NetMessage
     {
+        public bool Drives { get; set; }
         public string Path { get; set; }
     }
 

@@ -46,48 +46,66 @@ namespace BlackHole.Slave
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static FolderNavigationMessage NavigateToFolder(string path)
+        public static FolderNavigationMessage NavigateToFolder(string path, bool drives)
         {
-            // transform relative to absolute
-            path = Path.GetFullPath(path);
-
-            var files = new List<FileMeta>()
+            if (drives)
             {
-                new FileMeta()
+                return new FolderNavigationMessage()
                 {
-                    Type = FileType.FOLDER,
-                    Name = "..",
-                    Size = "0"
-                }
-            };
-            // append directories
-            files
-                .AddRange(Directory
-                                .GetDirectories(path)
-                                .Select(name => new DirectoryInfo(name))
-                                .Select(info => new FileMeta()
-                                {
-                                    Type = FileType.FOLDER,
-                                    Name = info.Name + "\\",
-                                    Size = "0"
-                                }));
-            // append files
-            files
-                .AddRange(Directory
-                                .GetFiles(path)
-                                .Select(name => new FileInfo(name))
-                                .Select(info => new FileMeta()
-                                {
-                                    Type = FileType.FILE,
-                                    Name = info.Name,
-                                    Size = Utility.FormatFileSize(info.Length)
-                                }));
-
-            return new FolderNavigationMessage()
+                    Path = path,
+                    Files = DriveInfo.GetDrives()
+                    .Where(drive => drive.IsReady)
+                    .Select(drive => new FileMeta()
+                    {
+                        Type = FileType.FOLDER,
+                        Name = drive.Name,
+                        Size = drive.DriveType.ToString()
+                    }).ToList()
+                };
+            }
+            else
             {
-                Path = path,
-                Files = files
-            };
+                // transform relative to absolute
+                path = Path.GetFullPath(path);
+
+                var files = new List<FileMeta>()
+                {
+                    new FileMeta()
+                    {
+                        Type = FileType.FOLDER,
+                        Name = "..",
+                        Size = "0"
+                    }
+                };
+                // append directories
+                files
+                    .AddRange(Directory
+                                    .GetDirectories(path)
+                                    .Select(name => new DirectoryInfo(name))
+                                    .Select(info => new FileMeta()
+                                    {
+                                        Type = FileType.FOLDER,
+                                        Name = info.Name + "\\",
+                                        Size = "0"
+                                    }));
+                // append files
+                files
+                    .AddRange(Directory
+                                    .GetFiles(path)
+                                    .Select(name => new FileInfo(name))
+                                    .Select(info => new FileMeta()
+                                    {
+                                        Type = FileType.FILE,
+                                        Name = info.Name,
+                                        Size = Utility.FormatFileSize(info.Length)
+                                    }));
+
+                return new FolderNavigationMessage()
+                {
+                    Path = path,
+                    Files = files
+                };
+            }
         }
     }
 }

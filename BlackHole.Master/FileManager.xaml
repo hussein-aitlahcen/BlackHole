@@ -19,11 +19,12 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="600" />
-                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBox Name="TxtBoxDirectory" Text=".." Grid.Column="0" />
-                <Button Name="BtnNavigate" Content="Navigate" Click="OnNavigate" Grid.Column="2" />
+                <Button Name="BtnNavigate" Content="Navigate" Click="OnNavigate" Grid.Column="1" />
+                <Button Name="BtnGoToDrives" Content="Drives" Click="OnGoToDrives" Grid.Column="2" />
             </Grid>
         </GroupBox>
         <GroupBox Header="Upload file to current directory" Grid.Row="1" Margin="10">
