@@ -9,12 +9,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace BlackHole.Master
 {
     public abstract class SlaveWindow : Window, IEventListener<SlaveEvent, Slave>
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Id
+        {
+            get;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -68,6 +77,7 @@ namespace BlackHole.Master
         /// <param name="slave"></param>
         public SlaveWindow(Slave slave)
         {
+            Id = GetHashCode();
             Slave = slave;
             m_pendingCommands = new Queue<IRemoteCommand>();
             ViewModelCommands = new ViewModelCollection<IRemoteCommand>();
@@ -77,7 +87,18 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         public SlaveWindow() { }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="message"></param>
+        public void Send(NetMessage message)
+        {
+            message.WindowId = Id;
+            Slave.Send(message);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -87,7 +108,6 @@ namespace BlackHole.Master
             FindControl<ContentPresenter>("TargetStatusPresenter", (parent) =>
             {
                 SetContentChildContext(parent, "TargetStatusBar", Slave);
-
                 ExecuteForContentChild<Label>(parent, "TargetStatus", (lbl) => TargetStatus = lbl);
                 ExecuteForContentChild<ToolTip>(parent, "TargetStatusTooltip", (tooltip) => TargetStatusTooltip = tooltip);
                 ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipTitle", (txtBlock) => TargetStatusTooltipTitle = txtBlock);

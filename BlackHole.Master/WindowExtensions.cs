@@ -15,13 +15,6 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="window"></param>
-        /// <param name="message"></param>
-        public static void Send(this SlaveWindow window, NetMessage message) => window.Slave.Send(message);
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="action"></param>
         public static async void WrapEvent<T>(this Window window, T obj, Action<T> action)
             => await ExecuteInDispatcher(window, () => action(obj));

@@ -80,7 +80,7 @@
                     <GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Id}" />
                     <GridViewColumn Header="Command" Width="150" DisplayMemberBinding="{Binding HeaderText}" />
                     <GridViewColumn Header="Target" Width="250" DisplayMemberBinding="{Binding TargetText}" />
-                    <GridViewColumn Header="Progession" Width="400" >
+                    <GridViewColumn Header="Progession" Width="400">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ProgressBar Maximum="100" Foreground="{Binding ProgressColor}" Value="{Binding Progress}" Height="18" Margin="5"/>

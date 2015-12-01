@@ -230,7 +230,19 @@ namespace BlackHole.Master
             };
 
             // register the slave window to the events of the slave
-            Slave.SlaveEvents.Subscribe((ev) => ev.Source.Id == window.Slave.Id, window);
+            Slave.SlaveEvents.Subscribe((ev) => 
+            {
+                // should be our slave
+                if (ev.Source.Id != window.Slave.Id)
+                    return false;
+
+                var statusMessage = ev.Data as StatusUpdateMessage;
+                if (statusMessage != null)
+                    if(statusMessage.WindowId != -1 && statusMessage.WindowId != window.Id)
+                        return false;
+
+                return true;
+            }, window);
 
             m_childWindows.Add(window);
             

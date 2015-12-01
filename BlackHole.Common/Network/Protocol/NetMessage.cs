@@ -174,6 +174,11 @@ namespace BlackHole.Common.Network.Protocol
     public abstract class NetMessage
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public int WindowId { get; set; }
+
+        /// <summary>
         /// Cache buffer
         /// </summary>
         private byte[] m_serializedBuffer;
