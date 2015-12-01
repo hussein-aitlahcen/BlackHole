@@ -359,7 +359,6 @@ namespace BlackHole.Master
                                 TargetStatus.Foreground = m.Success ? Brushes.DarkGreen : Brushes.Red;
                                 TargetStatusTooltip.PlacementTarget = TargetStatus;
                                 TargetStatusTooltip.IsOpen = true;
-                                TargetStatusTooltip.StaysOpen = false;
 
                                 if ((m_currentCommand != null) && (m.OperationId == m_currentCommand.Id) && !m.Success)
                                 {

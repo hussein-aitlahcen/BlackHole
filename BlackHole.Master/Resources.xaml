@@ -2,9 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:BlackHole.Master">
     <Image x:Key="FileManagerIcon" Source="Resources/icons/light/appbar.cabinet.files.variant.png" Width="20" Height="20" />
-    <Image x:Key="RemoteDesktopIcon" Source="Resources/icons/light/appbar.monitor.png" Width="20" Height="20" />
-    
-    <Image x:Key="DownloadFileIcon" Source="Resources/icons/light/appbar.page.download.png" Width="20" Height="20" />
+    <Image x:Key="RemoteDesktopIcon" Source="Resources/icons/light/appbar.eye.png" Width="20" Height="20" />
+
+    <Image x:Key="ExecuteFileIcon" Source="Resources/icons/light/appbar.camera.flash.png" Width="20" Height="20" />
+    <Image x:Key="DownloadFileIcon" Source="Resources/icons/light/appbar.download.png" Width="20" Height="20" />
     <Image x:Key="DeleteFileIcon" Source="Resources/icons/light/appbar.delete.png" Width="20" Height="20" />
     <Image x:Key="CancelTransactionIcon" Source="Resources/icons/light/appbar.cancel.png" Width="20" Height="20" />
     

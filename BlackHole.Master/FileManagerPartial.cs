@@ -71,41 +71,56 @@ namespace BlackHole.Master
                     DeleteFile(meta.Name);
             });
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnGoToDrives(object sender, RoutedEventArgs e) => NavigateToDrives();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnNavigate(object sender, RoutedEventArgs e) => NavigateToTypedFolder();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void NavigateToTypedFolder() => NavigateToFolder(TxtBoxDirectory.Text);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void NavigateToDrives() => NavigateToFolder(string.Empty, true);
+        private void OnExecuteFile(object sender, RoutedEventArgs e)
+             => ExecuteSelectedFiles();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnUpload(object sender, RoutedEventArgs e) => UploadTypedFile();
+        private void OnGoToDrives(object sender, RoutedEventArgs e) 
+            => NavigateToDrives();
 
         /// <summary>
         /// 
         /// </summary>
-        private void UploadTypedFile() => UploadFile(TxtBoxUpload.Text);
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnNavigate(object sender, RoutedEventArgs e) 
+            => NavigateToTypedFolder();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void NavigateToTypedFolder()
+            => NavigateToFolder(TxtBoxDirectory.Text);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void NavigateToDrives() 
+            => NavigateToFolder(string.Empty, true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnUpload(object sender, RoutedEventArgs e) 
+            => UploadTypedFile();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UploadTypedFile() 
+            => UploadFile(TxtBoxUpload.Text);
 
         /// <summary>
         /// 
@@ -124,7 +139,8 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnDownloadFile(object sender, RoutedEventArgs e) => DownloadSelectedFiles();
+        private void OnDownloadFile(object sender, RoutedEventArgs e) 
+            => DownloadSelectedFiles();
 
         /// <summary>
         /// 
@@ -139,9 +155,20 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
+        private void ExecuteSelectedFiles() =>
+            ExecuteOnSelectedItems<FileMeta>(FilesList, (meta) =>
+            {
+                if (meta.Type == FileType.FILE)
+                    ExecuteFile(meta.Name);
+            });
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnCancelTransaction(object sender, RoutedEventArgs e) => CancelSelectedTransactions();
+        private void OnCancelTransaction(object sender, RoutedEventArgs e)
+            => CancelSelectedTransactions();
 
         /// <summary>
         /// 
@@ -154,7 +181,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="folder"></param>
         private void NavigateToFolder(string folder, bool drives = false) =>
-            this.Send(new NavigateToFolderMessage()
+            Send(new NavigateToFolderMessage()
             {
                 Drives = drives,
                 Path = Path.Combine(TxtBoxDirectory.Text, folder)
@@ -164,14 +191,21 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="name"></param>
-        private void DeleteFile(string name)
-        {
-            var filePath = GetFilePath(name);
-            this.Send(new DeleteFileMessage()
+        private void DeleteFile(string name) => 
+            Send(new DeleteFileMessage()
             {
-                FilePath = filePath
+                FilePath = GetFilePath(name)
             });
-        }  
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        private void ExecuteFile(string name) =>
+            Send(new ExecuteFileMessage()
+            {
+                FilePath = GetFilePath(name)
+            });
         
         /// <summary>
         /// 

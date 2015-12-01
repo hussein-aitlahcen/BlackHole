@@ -60,6 +60,7 @@
             </ListView.View>
             <ListView.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Execute file" Click="OnExecuteFile" Icon="{StaticResource ExecuteFileIcon}" />
                     <MenuItem Header="Download file" Click="OnDownloadFile" Icon="{StaticResource DownloadFileIcon}" />
                     <MenuItem Header="Deleted file" Click="OnDeleteFile" Icon="{StaticResource DeleteFileIcon}" />
                 </ContextMenu>
