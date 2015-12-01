@@ -156,9 +156,7 @@ namespace BlackHole.Master
             var frames = new NetMQMessage();
             frames.Append(Identity);
             frames.Append(message.Serialize());
-
             FireSlaveOutgoingMessage(this, message);
-
             return NetworkService.Instance.Send(frames);
         }
 

