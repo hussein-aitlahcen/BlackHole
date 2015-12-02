@@ -51,8 +51,12 @@ namespace BlackHole.Common
         /// <param name="part"></param>
         public static void WriteDownloadedPart(string directory, string fileName, long currentPart, byte[] rawData)
         {
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
             var path = Path.Combine(directory, Path.GetFileName(fileName));
             var existing = File.Exists(path);
+
             // output the part to local file
             using(var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
             {

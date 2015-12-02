@@ -25,7 +25,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="action"></param>
         public static async Task ExecuteInDispatcher(this Window window, Action action)
-            => await window.Dispatcher.InvokeAsync(action, DispatcherPriority.ContextIdle);
+            => await window.Dispatcher.InvokeAsync(action, DispatcherPriority.Background);
         
 
         /// <summary>
