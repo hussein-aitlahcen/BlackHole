@@ -461,5 +461,15 @@ namespace BlackHole.Slave
 
             }, message.FilePath);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reason"></param>
+        public void FireShutdown(int reason) =>
+            Send(new ShutdownMessage()
+            {
+                Reason = reason,
+            });
     }
 }

