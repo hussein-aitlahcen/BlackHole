@@ -323,6 +323,7 @@ namespace BlackHole.Master
         protected void FireFakeStatus(long operationId, string operation, bool success, string message) =>
             FireSlaveEvent(SlaveEventType.INCOMMING_MESSAGE, new StatusUpdateMessage()
             {
+                WindowId = Id,
                 OperationId = operationId,
                 Operation = operation,
                 Message = message,

