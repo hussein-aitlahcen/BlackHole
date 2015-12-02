@@ -220,7 +220,7 @@ namespace BlackHole.Master
                 fileName,
                 (command) =>
                 {
-                    this.Send(new UploadFileMessage()
+                    Send(new UploadFileMessage()
                     {
                         Id = command.Id,
                         Path = GetFilePath(fileName),
@@ -258,7 +258,7 @@ namespace BlackHole.Master
 
                 (command) => // execute
                 {
-                    this.Send(new DownloadFilePartMessage()
+                    Send(new DownloadFilePartMessage()
                     {
                         Id = command.Id,
                         CurrentPart = 0,
@@ -271,7 +271,7 @@ namespace BlackHole.Master
                     {
                         FileHelper.WriteDownloadedPart(Slave.OutputDirectory, download.Path, download.CurrentPart, download.RawPart);
                         
-                        this.Send(new DownloadFilePartMessage()
+                        Send(new DownloadFilePartMessage()
                         {
                             Id = download.Id,
                             Path = download.Path,

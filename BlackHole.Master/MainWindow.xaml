@@ -28,7 +28,7 @@
                     </ContextMenu>
                 </ListView.ContextMenu>
             </ListView>
-            <RichTextBox Name="Console" Margin="10 0 10 0" IsReadOnly="True" Height="240" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+            <RichTextBox Name="Console" Margin="10 0 10 0" IsReadOnly="True" Height="240" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
             <StatusBar Name="SlaveStatusBar" Margin="10" BorderThickness="1" BorderBrush="Black" Background="White">
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>

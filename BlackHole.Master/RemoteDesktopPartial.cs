@@ -25,6 +25,12 @@ namespace BlackHole.Master
             : base(slave)
         {
             InitializeComponent();
+
+            Closing += (s, e) =>
+            {
+                // in case we leave the window withouth stopping
+                StopCapture();
+            };
         }
 
         /// <summary>
@@ -47,7 +53,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         private void StartCapture(int screen = 0, int quality = 10, int rate = 10) =>
-            this.Send(new StartScreenCaptureMessage()
+            Send(new StartScreenCaptureMessage()
             {
                 Quality = quality,
                 Rate = rate,
@@ -58,7 +64,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         private void StopCapture() =>
-            this.Send(new StopScreenCaptureMessage());
+            Send(new StopScreenCaptureMessage());
         
         /// <summary>
         /// 
@@ -66,6 +72,8 @@ namespace BlackHole.Master
         /// <param name="message"></param>
         private void UpdateScreenCapture(ScreenCaptureMessage message)
         {
+            if (ScreenCaptureImage.Source != null)
+                ((BitmapImage)ScreenCaptureImage.Source).StreamSource.Dispose();
             ScreenCaptureImage.Source = BitmapToImageSource(message.RawImage);
         }
 

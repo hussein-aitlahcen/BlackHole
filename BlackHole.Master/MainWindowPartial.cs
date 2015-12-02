@@ -96,6 +96,7 @@ namespace BlackHole.Master
                 var textRange = new TextRange(Console.Document.ContentEnd, Console.Document.ContentEnd);
                 textRange.Text = message + '\u2028';
                 textRange.ApplyPropertyValue(TextElement.ForegroundProperty, color);
+                Console.ScrollToEnd();
             });
         }
 

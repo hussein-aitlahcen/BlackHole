@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlackHole.Slave
+namespace BlackHole.Slave.Helper
 {
     /// <summary>
     /// 

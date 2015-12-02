@@ -22,7 +22,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBox Name="TxtBoxDirectory" Text=".." Grid.Column="0" />
+                <TextBox Name="TxtBoxDirectory" Text=".." Grid.Column="0" KeyDown="TxtBoxDirectory_KeyDown" />
                 <Button Name="BtnNavigate" Content="Navigate" Click="OnNavigate" Grid.Column="1" />
                 <Button Name="BtnGoToDrives" Content="Drives" Click="OnGoToDrives" Grid.Column="2" />
             </Grid>
@@ -34,7 +34,7 @@
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBox Name="TxtBoxUpload" Text="http://example.com/script.bat" Grid.Column="0" />
+                <TextBox Name="TxtBoxUpload" Text="http://example.com/script.bat" Grid.Column="0" KeyDown="TxtBoxUpload_KeyDown" />
                 <Button Name="BtnUpload" Content="Upload" Click="OnUpload" Grid.Column="2" />
             </Grid>
         </GroupBox>
@@ -60,8 +60,8 @@
             </ListView.View>
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Execute file" Click="OnExecuteFile" Icon="{StaticResource ExecuteFileIcon}" />
                     <MenuItem Header="Download file" Click="OnDownloadFile" Icon="{StaticResource DownloadFileIcon}" />
+                    <MenuItem Header="Execute file" Click="OnExecuteFile" Icon="{StaticResource ExecuteFileIcon}" />
                     <MenuItem Header="Deleted file" Click="OnDeleteFile" Icon="{StaticResource DeleteFileIcon}" />
                 </ContextMenu>
             </ListView.ContextMenu>

@@ -31,7 +31,9 @@
                 <Button Grid.Column="5" Name="BtnStop" Content="Stop" Foreground="DarkRed" Click="OnStopCapture" />
             </Grid>
         </GroupBox>
-        <Image Grid.Row="1" Margin="10" Name="ScreenCaptureImage" />
+        <GroupBox Grid.Row="1" Header="Stream"  Margin="10">
+            <Image Name="ScreenCaptureImage" />
+        </GroupBox>
         <ContentPresenter Grid.Row="2" Name="TargetStatusPresenter" ContentTemplate="{StaticResource TargetSlaveStatusBar}" />
     </Grid>
 </src:SlaveWindow>

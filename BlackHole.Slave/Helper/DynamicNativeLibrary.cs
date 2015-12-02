@@ -8,7 +8,7 @@ using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlackHole.Slave
+namespace BlackHole.Slave.Helper
 {
     public sealed class DynamicNativeLibrary : IDisposable
     {

@@ -120,6 +120,15 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
+        public bool IsInitialized
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string OutputDirectory => MachineName;
         
         /// <summary>
@@ -139,12 +148,16 @@ namespace BlackHole.Master
         /// <param name="os"></param>
         /// <param name="machine"></param>
         /// <param name="user"></param>
-        public void Initialize(string ip, string os, string machine, string user)
+        public bool Initialize(string ip, string os, string machine, string user)
         {
+            if (IsInitialized)
+                return false;
+            IsInitialized = true;
             Ip = ip;
             OperatingSystem = os;
             MachineName = machine;
             UserName = user;
+            return true;
         }
 
         /// <summary>

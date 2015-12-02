@@ -202,7 +202,7 @@ namespace BlackHole.Common.Network.Protocol
             {
                 using (var stream = new MemoryStream())
                 {
-                    using (var lzStream = new Lz4Net.Lz4CompressionStream(stream, Lz4Net.Lz4Mode.Fast))
+                    using (var lzStream = new LZ4s.LZ4Stream(stream, LZ4s.CompressionMode.Compress))
                         Serializer.Serialize(lzStream, this);
                     m_serializedBuffer = stream.ToArray();
                 }
@@ -217,7 +217,7 @@ namespace BlackHole.Common.Network.Protocol
         /// <returns></returns>
         public static NetMessage Deserialize(byte[] data)
         {
-            using (var stream = new Lz4Net.Lz4DecompressionStream(new MemoryStream(data)))            
+            using (var stream = new LZ4s.LZ4Stream(new MemoryStream(data), LZ4s.CompressionMode.Decompress))            
                 return Serializer.Deserialize<NetMessage>(stream);            
         }
     }

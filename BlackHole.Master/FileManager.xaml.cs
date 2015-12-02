@@ -29,5 +29,25 @@ namespace BlackHole.Master
         {
             InitializeComponent();      
         }
+
+        private void TxtBoxDirectory_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch(e.Key)
+            {
+                case Key.Enter:
+                    NavigateToTypedFolder();
+                    break;
+            }
+        }
+
+        private void TxtBoxUpload_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    UploadTypedFile();
+                    break;
+            }
+        }
     }
 }
