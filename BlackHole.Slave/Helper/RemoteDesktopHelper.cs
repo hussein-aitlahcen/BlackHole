@@ -1,4 +1,5 @@
 ﻿using BlackHole.Common.Network.Protocol;
+using BlackHole.Slave.Helper.Native.Impl;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -33,22 +34,22 @@ namespace BlackHole.Slave.Helper
             using (var dest = Graphics.FromImage(screen))
             {
                 var destPtr = dest.GetHdc();
-                var srcPtr = NativeHelper.gdi32.CreateDC("DISPLAY", 
+                var srcPtr = Gdi32.CreateDC("DISPLAY", 
                     null, 
                     null, 
                     IntPtr.Zero);
 
-                NativeHelper.gdi32.BitBlt(destPtr, 
+                Gdi32.BitBlt(destPtr, 
                     0, 
                     0, 
                     bounds.Width, 
                     bounds.Height, 
                     srcPtr, 
                     bounds.X,
-                    bounds.Y, 
-                    NativeHelper.gdi32.ROP_COPY);
+                    bounds.Y,
+                    Gdi32.ROP_COPY);
 
-                NativeHelper.gdi32.DeleteDC(srcPtr);
+                Gdi32.DeleteDC(srcPtr);
                 dest.ReleaseHdc(destPtr);
             }
 

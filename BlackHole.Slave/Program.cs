@@ -1,4 +1,5 @@
 ﻿using BlackHole.Slave.Helper;
+using BlackHole.Slave.Helper.Native.Impl;
 using BlackHole.Slave.Malicious;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace BlackHole.Slave
             MaliciousManager.Instance.Initialize();
             NetworkService.Instance.Initialize();
 
-            NativeHelper.kernel32.SetConsoleCtrlHandler((ctrl) =>
+            Kernel32.SetConsoleCtrlHandler((ctrl) =>
             {
                 NetworkService.Instance.FireShutdown((int)ctrl);
                 Thread.Sleep(10000);
