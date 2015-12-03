@@ -35,6 +35,7 @@ namespace BlackHole.Slave.Helper
             Is64Bit = Environment.Is64BitOperatingSystem;
             FullName = string.Format("{0} {1} Bit", Name, Is64Bit ? 64 : 32);
         }
+        
         public static string FullName { get; private set; }
         public static string Name { get; private set; }
         public static bool Is64Bit { get; private set; }

