@@ -1,6 +1,6 @@
 # BlackHole
-C# RAT (Remote Adminitration Tool) 
-Focused on performance and code clarity.
+- C# RAT (Remote Adminitration Tool) 
+- Study purpose only
 
 # Technologies
 - protobuf-net : message serialization/deserialization in slave<->master protocol
