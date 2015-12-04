@@ -13,7 +13,7 @@ namespace BlackHole.Master
     /// </summary>
     public partial class App : Application
     {
-        public static ResourceDictionary Resources
+        public static ResourceDictionary StaticResources
         {
             get;
             private set;
@@ -29,7 +29,7 @@ namespace BlackHole.Master
 
         void App_Startup(object sender, StartupEventArgs e)
         {
-            Resources = Current.Resources.MergedDictionaries.First();
+            StaticResources = Current.Resources.MergedDictionaries.First();
             Master.MainWindow.Instance.Show();
         }
     }
