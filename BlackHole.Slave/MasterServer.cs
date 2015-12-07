@@ -164,8 +164,10 @@ namespace BlackHole.Slave
                     SendFailedStatus(message.WindowId, "Message parsing", $"Unknow message {m.GetType().Name}");
                 });
 
+#if DEBUG
             if(message.GetType() != typeof(PingMessage))
                 Console.WriteLine(message.GetType().Name);
+#endif
         }
 
 
