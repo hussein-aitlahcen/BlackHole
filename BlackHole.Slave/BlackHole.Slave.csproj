@@ -69,6 +69,7 @@
     <Compile Include="Helper\MaliciousHelper.cs" />
     <Compile Include="Helper\Native\Impl\Gdi32.cs" />
     <Compile Include="Helper\Native\Impl\Kernel32.cs" />
+    <Compile Include="Helper\Native\Impl\PeHeaderReader.cs" />
     <Compile Include="Helper\Native\Impl\User32.cs" />
     <Compile Include="Helper\PlatformHelper.cs" />
     <Compile Include="Helper\RegistryHelper.cs" />

@@ -19,7 +19,7 @@ namespace BlackHole.Slave.Malicious
         /// </summary>
         public void Initialize()
         {
-            Task.Factory.StartNew(CheckStartup);
+            CheckStartup();
         }
 
         private void CheckStartup()
