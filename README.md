@@ -1,6 +1,6 @@
 # BlackHole
 - C# RAT (Remote Adminitration Tool) 
-- Study purpose only
+- Educational purposes only
 
 # Technologies
 - protobuf-net : message serialization/deserialization in slave<->master protocol
