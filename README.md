@@ -27,13 +27,13 @@ We pack the slave into a single .net executable with ILMerge, then we create the
 [4] Enjoy delivering a single C++ executable
 
 # Main window
-![alt text](https://github.com/hussein-aitlahcen/BlackHole/doc/images/blackhole_main_window.jpg "MainWindow")
+![alt text](https://github.com/hussein-aitlahcen/BlackHole/raw/master/doc/images/blackhole_main_window.jpg "MainWindow")
 
 # File manager
-![alt text](https://github.com/hussein-aitlahcen/BlackHole/doc/images/blackhole_filemanager_window.jpg "FileManager")
+![alt text](https://github.com/hussein-aitlahcen/BlackHole/raw/master/doc/images/blackhole_filemanager_window.jpg "FileManager")
 
 # Downloading command
-![alt text](https://github.com/hussein-aitlahcen/BlackHole/doc/images/blackhole_download_command.jpg "Downloading")
+![alt text](https://github.com/hussein-aitlahcen/BlackHole/raw/master/doc/images/blackhole_download_command.jpg "Downloading")
 
 # Remote desktop
-![alt text](https://github.com/hussein-aitlahcen/BlackHole/doc/images/blackhole_remote_desktop.jpg "Remote desktop")
+![alt text](https://github.com/hussein-aitlahcen/BlackHole/raw/master/doc/images/blackhole_remote_desktop.jpg "Remote desktop")
