@@ -1,12 +1,10 @@
-﻿using BlackHole.Common;
-using BlackHole.Common.Network.Protocol;
-using NetMQ;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BlackHole.Common;
+using BlackHole.Common.Network.Protocol;
+using NetMQ;
 using NetMQ.Sockets;
 
 namespace BlackHole.Master

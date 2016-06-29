@@ -1,17 +1,12 @@
-﻿using BlackHole.Common;
-using BlackHole.Common.Network.Protocol;
-using BlackHole.Master.Model;
-using BlackHole.Master.Remote;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
+using BlackHole.Common;
+using BlackHole.Common.Network.Protocol;
+using BlackHole.Master.Model;
+using BlackHole.Master.Remote;
 
 namespace BlackHole.Master
 {

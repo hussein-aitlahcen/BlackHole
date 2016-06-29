@@ -1,18 +1,15 @@
-﻿using BlackHole.Common;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
 using BlackHole.Slave.Helper;
 using BlackHole.Slave.Helper.Native.Impl;
 using NetMQ;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using NetMQ.Sockets;
 
 namespace BlackHole.Slave
