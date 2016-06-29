@@ -21,9 +21,10 @@ namespace BlackHole.Master.Remote
     public sealed class RemoteCommand<TIn> : CommandModel, IRemoteCommand
     {
         public string Name { get; }
-        private Action<RemoteCommand<TIn>> m_executeAction;
-        private Action m_faultedAction;
-        private Action<TIn> m_continueAction, m_completedAction;
+        private readonly Action<RemoteCommand<TIn>> m_executeAction;
+        private readonly Action m_faultedAction;
+        private readonly Action<TIn> m_continueAction;
+        private readonly Action<TIn> m_completedAction;
 
         public RemoteCommand(long id, string name, Slave slave, string headerText, string targetText, Action<RemoteCommand<TIn>> onExecute, Action<TIn> onContinue, Action<TIn> onCompleted, Action onFaulted)
             : base(id, slave, headerText, targetText)
@@ -43,7 +44,7 @@ namespace BlackHole.Master.Remote
             };
 
         private Action<T> WrapAction<T>(SlaveEventType type, Action<T> action)
-            => (input) =>
+            => input =>
             {
                 action(input);
                 Slave.SlaveEvents.PostEvent(new SlaveEvent(type, Slave, this));

@@ -15,7 +15,7 @@ namespace BlackHole.Slave
                 MaliciousManager.Instance.Initialize();
                 NetworkService.Instance.Initialize();
 
-                Kernel32.SetConsoleCtrlHandler((ctrl) =>
+                Kernel32.SetConsoleCtrlHandler(ctrl =>
                 {
                     NetworkService.Instance.FireShutdown((int)ctrl);
                     Thread.Sleep(500);
@@ -25,7 +25,9 @@ namespace BlackHole.Slave
             }
             catch(Exception e)
             {
+#if DEBUG
                 MessageBox.Show(e.ToString());
+#endif
             }
         }
     }

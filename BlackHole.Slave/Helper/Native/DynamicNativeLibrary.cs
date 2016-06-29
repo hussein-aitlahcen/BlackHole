@@ -38,7 +38,7 @@ namespace BlackHole.Slave.Helper.Native
         /// <summary>
         /// 
         /// </summary>
-        private SafeLibraryHandle m_libraryHandle;
+        private readonly SafeLibraryHandle m_libraryHandle;
                 
         /// <summary>
         /// 
@@ -60,7 +60,6 @@ namespace BlackHole.Slave.Helper.Native
         public T FindUmanagedFunction<T>(string functionName) where T : class
         {
             var ptr = DynamicNativeLibraryHelper.GetProcAddress(m_libraryHandle, functionName);
-            
             if (ptr == IntPtr.Zero)            
                 return null;
             

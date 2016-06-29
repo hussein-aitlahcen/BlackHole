@@ -29,7 +29,7 @@ namespace BlackHole.Common
         /// <summary>
         /// 
         /// </summary>
-        private T m_obj;
+        private readonly T m_obj;
 
         /// <summary>
         /// 
@@ -44,6 +44,7 @@ namespace BlackHole.Common
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <typeparam name="V"></typeparam>
         /// <param name="action"></param>
         /// <returns></returns>
         public Matcher<T> With<V>(Action<V> action) 

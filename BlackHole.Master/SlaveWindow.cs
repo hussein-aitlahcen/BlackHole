@@ -35,7 +35,6 @@ namespace BlackHole.Master
         public ViewModelCollection<IRemoteCommand> ViewModelCommands
         {
             get;
-            private set;
         }
 
         /// <summary>
@@ -72,7 +71,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="slave"></param>
-        public SlaveWindow(Slave slave)
+        protected SlaveWindow(Slave slave)
         {
             Id = GetHashCode();
             Slave = slave;
@@ -83,12 +82,11 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public SlaveWindow() { }
+        protected SlaveWindow() { }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="window"></param>
         /// <param name="message"></param>
         public void Send(NetMessage message)
         {
@@ -102,13 +100,13 @@ namespace BlackHole.Master
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            FindControl<ContentPresenter>("TargetStatusPresenter", (parent) =>
+            FindControl<ContentPresenter>("TargetStatusPresenter", parent =>
             {
                 SetContentChildContext(parent, "TargetStatusBar", Slave);
-                ExecuteForContentChild<Label>(parent, "TargetStatus", (lbl) => TargetStatus = lbl);
-                ExecuteForContentChild<ToolTip>(parent, "TargetStatusTooltip", (tooltip) => TargetStatusTooltip = tooltip);
-                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipTitle", (txtBlock) => TargetStatusTooltipTitle = txtBlock);
-                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipMessage", (txtBlock) => TargetStatusTooltipMessage = txtBlock);
+                ExecuteForContentChild<Label>(parent, "TargetStatus", lbl => TargetStatus = lbl);
+                ExecuteForContentChild<ToolTip>(parent, "TargetStatusTooltip", tooltip => TargetStatusTooltip = tooltip);
+                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipTitle", txtBlock => TargetStatusTooltipTitle = txtBlock);
+                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipMessage", txtBlock => TargetStatusTooltipMessage = txtBlock);
             });
         }
 
@@ -117,6 +115,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="controlName"></param>
+        /// <param name="callback"></param>
         /// <returns></returns>
         protected void FindControl<T>(string controlName, Action<T> callback) where T : FrameworkElement
         {
@@ -125,13 +124,12 @@ namespace BlackHole.Master
                 callback(control);
         }
 
-
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         protected void SetContentChildContext(ContentPresenter parent, string objectName, object context)
-            => ExecuteForContentChild<FrameworkElement>(parent, objectName, (content) => content.DataContext = context);
+            => ExecuteForContentChild<FrameworkElement>(parent, objectName, content => content.DataContext = context);
 
         /// <summary>
         /// 
@@ -183,7 +181,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="objects"></param>
+        /// <param name="listView"></param>
         /// <param name="action"></param>
         protected void ExecuteOnSelectedItems<T>(ListView listView, Action<T> action)
         {
@@ -212,10 +210,7 @@ namespace BlackHole.Master
         {
             var temp = m_currentCommand;
             // we delay the remove so we see small file downloads, otherwise it would be dropped instantly (download too fast)
-            Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () =>
-            {
-                ViewModelCommands.RemoveItem(temp);
-            });
+            Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () => ViewModelCommands.RemoveItem(temp));
             m_currentCommand = null;
             ExecuteNextCommandIfPossible();
         }
@@ -255,9 +250,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <typeparam name="TIn"></typeparam>
         /// <param name="input"></param>
-        /// <param name="onContinue"></param>
-        /// <param name="onCompleted"></param>
-        /// <param name="onCancelled"></param>
+        /// <param name="onUpdate"></param>
         protected void UpdateCommand<TIn>(TIn input, Action<RemoteCommand<TIn>> onUpdate)
         {
             var command = GetCommmandAs<TIn>();
@@ -318,7 +311,7 @@ namespace BlackHole.Master
         /// <param name="success"></param>
         /// <param name="message"></param>
         protected void FireFakeStatus(long operationId, string operation, bool success, string message) =>
-            FireSlaveEvent(SlaveEventType.INCOMMING_MESSAGE, new StatusUpdateMessage()
+            FireSlaveEvent(SlaveEventType.INCOMMING_MESSAGE, new StatusUpdateMessage
             {
                 WindowId = Id,
                 OperationId = operationId,

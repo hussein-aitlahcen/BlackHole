@@ -21,9 +21,9 @@ namespace BlackHole.Master
         
         private NetMQSocket m_server;
         private NetMQPoller m_poller;
-        private Dictionary<int, Slave> m_slaveById;
+        private readonly Dictionary<int, Slave> m_slaveById;
         private bool m_started;
-        private ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
+        private readonly ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
 
         /// <summary>
         /// 

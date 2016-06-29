@@ -20,11 +20,8 @@ namespace BlackHole.Master
         {
             InitializeComponent();
 
-            Closing += (s, e) =>
-            {
-                // in case we leave the window withouth stopping
-                StopCapture();
-            };
+            // in case we leave the window withouth stopping
+            Closing += (s, e) => StopCapture();
         }
 
         /// <summary>
@@ -47,11 +44,11 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         private void StartCapture(int screen = 0, int quality = 10, int rate = 10) =>
-            Send(new StartScreenCaptureMessage()
+            Send(new StartScreenCaptureMessage
             {
                 Quality = quality,
                 Rate = rate,
-                ScreenNumber = screen,
+                ScreenNumber = screen
             });
 
         /// <summary>
@@ -74,7 +71,7 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="bitmap"></param>
+        /// <param name="rawData"></param>
         /// <returns></returns>
         private BitmapImage BitmapToImageSource(byte[] rawData)
         {

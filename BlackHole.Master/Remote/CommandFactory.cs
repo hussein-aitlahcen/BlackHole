@@ -6,7 +6,7 @@ namespace BlackHole.Master.Remote
     public enum CommandType
     {
         DOWNLOAD,
-        UPLOAD,
+        UPLOAD
     }
 
     public static class CommandFactory

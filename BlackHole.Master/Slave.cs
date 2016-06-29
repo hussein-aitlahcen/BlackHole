@@ -4,7 +4,6 @@ using NetMQ;
 
 namespace BlackHole.Master
 {
-
     /// <summary>
     /// 
     /// </summary>
@@ -19,7 +18,7 @@ namespace BlackHole.Master
         COMMAND_FAULTED,
         COMMAND_COMPLETED,
         FILE_DOWNLOADED,
-        FILE_UPLOADED,
+        FILE_UPLOADED
     }
 
     /// <summary>
@@ -55,7 +54,6 @@ namespace BlackHole.Master
         public byte[] Identity
         {
             get;
-            private set;
         }
 
         /// <summary>
@@ -64,7 +62,6 @@ namespace BlackHole.Master
         public int Id
         {
             get;
-            private set;
         }
 
         /// <summary>
@@ -125,10 +122,11 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         public string OutputDirectory => MachineName;
-        
+
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="identity"></param>
         /// <param name="id"></param>
         public Slave(byte[] identity, int id)
         {
@@ -174,8 +172,7 @@ namespace BlackHole.Master
         /// <param name="slave"></param>
         /// <param name="message"></param>
         private void FireSlaveOutgoingMessage(Slave slave, NetMessage message)
-            => Slave.PostEvent(new SlaveEvent(SlaveEventType.OUTGOING_MESSAGE, slave, message));
-
+            => PostEvent(new SlaveEvent(SlaveEventType.OUTGOING_MESSAGE, slave, message));
 
         /// <summary>
         /// 

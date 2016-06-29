@@ -11,9 +11,10 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="slaveName"></param>
+        /// <param name="directory"></param>
         /// <param name="fileName"></param>
-        /// <param name="raw"></param>
+        /// <param name="currentPart"></param>
+        /// <param name="rawData"></param>
         public static void WriteDownloadedPart(string directory, string fileName, long currentPart, byte[] rawData)
             => CommonHelper.WriteDownloadedPart(directory, fileName, currentPart, rawData);
 

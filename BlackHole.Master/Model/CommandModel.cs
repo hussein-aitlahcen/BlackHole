@@ -48,6 +48,6 @@ namespace BlackHole.Master.Model
             m_progressColor = Brushes.Green;
         }
 
-        public void UpdateProgression(long current, long maximum) => Progress = ((current + 1) * 100) / Math.Max(maximum, 1);
+        public void UpdateProgression(long current, long maximum) => Progress = (current + 1) * 100 / Math.Max(maximum, 1);
     }
 }

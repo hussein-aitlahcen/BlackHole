@@ -11,7 +11,7 @@ namespace BlackHole.Slave
         /// <summary>
         /// /
         /// </summary>
-        private List<MasterServer> m_serverConnections;
+        private readonly List<MasterServer> m_serverConnections;
 
         /// <summary>
         /// 
@@ -33,6 +33,7 @@ namespace BlackHole.Slave
         /// 
         /// </summary>
         /// <param name="connection"></param>
+        /// <param name="address"></param>
         private void CreateConnection(string address) => m_serverConnections.Add(new MasterServer(address));
 
         /// <summary>

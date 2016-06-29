@@ -83,10 +83,11 @@ namespace BlackHole.Master
 
             AddInfoMessage("NetworkService running...");
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="color"></param>
         /// <param name="message"></param>
         public async Task AddConsoleMessage(Brush color, string message)
         {           
@@ -108,7 +109,7 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="messag"></param>
+        /// <param name="message"></param>
         public async void AddErrorMessage(string message) => await AddConsoleMessage(Brushes.Red, message);
         
         /// <summary>
@@ -124,13 +125,13 @@ namespace BlackHole.Master
                     case SlaveEventType.CONNECTED:
                         ViewModelSlaves.AddItem(ev.Source);
                         UpdateOnlineSlaves();
-                        AddInfoMessage($"connected slave={ev.Source.ToString()}");
+                        AddInfoMessage($"connected slave={ev.Source}");
                         break;
                     case SlaveEventType.DISCONNECTED:
                         ViewModelSlaves.RemoveItem(ev.Source);
                         UpdateOnlineSlaves();
                         CloseSlaveWindows(ev.Source.Id);
-                        AddInfoMessage($"disconnected slave={ev.Source.ToString()}");
+                        AddInfoMessage($"disconnected slave={ev.Source}");
 
                         break;
                     case SlaveEventType.INCOMMING_MESSAGE:
@@ -157,7 +158,7 @@ namespace BlackHole.Master
         private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             NetworkService.Instance.Stop();
-            m_childWindows.ForEach(async (window) => await window.ExecuteInDispatcher(() => window.Close()));
+            m_childWindows.ForEach(async window => await window.ExecuteInDispatcher(() => window.Close()));
         }
 
         /// <summary>
@@ -199,9 +200,9 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="slave"></param>
+        /// <param name="slaveId"></param>
         private void CloseSlaveWindows(int slaveId)
-           => FindSlaveWindows(slaveId).ForEach(async window => await window.ExecuteInDispatcher(() => window.Close()));
+           => FindSlaveWindows(slaveId).ForEach(async window => await window.ExecuteInDispatcher(window.Close));
 
         /// <summary>
         /// 
@@ -212,7 +213,7 @@ namespace BlackHole.Master
             // focus the existing window
             var existingWindow = m_childWindows
                 .OfType<T>()
-                .FirstOrDefault(w => (w.Slave.Id == window.Slave.Id));
+                .FirstOrDefault(w => w.Slave.Id == window.Slave.Id);
             if (existingWindow != null)
             {
                 await existingWindow.ExecuteInDispatcher(() => existingWindow.Focus());
@@ -230,7 +231,7 @@ namespace BlackHole.Master
             };
 
             // register the slave window to the events of the slave
-            Slave.SlaveEvents.Subscribe((ev) => 
+            Slave.SlaveEvents.Subscribe(ev => 
             {
                 // should be our slave
                 if (ev.Source.Id != window.Slave.Id)
