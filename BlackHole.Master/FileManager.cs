@@ -26,7 +26,6 @@ namespace BlackHole.Master
         public ViewModelCollection<FileMeta> ViewModelFiles
         {
             get;
-            private set;
         }
 
         /// <summary>

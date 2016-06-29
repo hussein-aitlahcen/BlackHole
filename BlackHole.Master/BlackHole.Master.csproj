@@ -68,15 +68,15 @@
     <Compile Include="FileManager.xaml.cs">
       <DependentUpon>FileManager.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileManagerPartial.cs" />
-    <Compile Include="MainWindowPartial.cs" />
+    <Compile Include="FileManager.cs" />
+    <Compile Include="MainWindow.cs" />
     <Compile Include="Model\CommandModel.cs" />
     <Compile Include="Model\SlaveMonitorModel.cs" />
     <Compile Include="Model\ViewModel.cs" />
     <Compile Include="RemoteDesktop.xaml.cs">
       <DependentUpon>RemoteDesktop.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RemoteDesktopPartial.cs" />
+    <Compile Include="RemoteDesktop.cs" />
     <Compile Include="Remote\CommandFactory.cs" />
     <Compile Include="Remote\RemoteCommand.cs" />
     <Compile Include="Slave.cs" />
