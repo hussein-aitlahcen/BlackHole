@@ -1,13 +1,8 @@
-﻿using BlackHole.Slave.Helper;
+﻿using System;
+using System.Threading;
+using System.Windows.Forms;
 using BlackHole.Slave.Helper.Native.Impl;
 using BlackHole.Slave.Malicious;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace BlackHole.Slave
 {

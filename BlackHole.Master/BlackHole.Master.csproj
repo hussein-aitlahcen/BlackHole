@@ -34,13 +34,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>BlackHole.Master.App</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AsyncIO, Version=0.1.18.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
       <HintPath>..\packages\AsyncIO.0.1.18.0\lib\net40\AsyncIO.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetMQ, Version=3.3.2.2, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetMQ.3.3.2.2\lib\net40\NetMQ.dll</HintPath>
+    <Reference Include="NetMQ, Version=3.3.3.1, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetMQ.3.3.3.1\lib\net40\NetMQ.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -68,15 +71,15 @@
     <Compile Include="FileManager.xaml.cs">
       <DependentUpon>FileManager.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileManagerPartial.cs" />
-    <Compile Include="MainWindowPartial.cs" />
+    <Compile Include="FileManager.cs" />
+    <Compile Include="MainWindow.cs" />
     <Compile Include="Model\CommandModel.cs" />
     <Compile Include="Model\SlaveMonitorModel.cs" />
     <Compile Include="Model\ViewModel.cs" />
     <Compile Include="RemoteDesktop.xaml.cs">
       <DependentUpon>RemoteDesktop.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RemoteDesktopPartial.cs" />
+    <Compile Include="RemoteDesktop.cs" />
     <Compile Include="Remote\CommandFactory.cs" />
     <Compile Include="Remote\RemoteCommand.cs" />
     <Compile Include="Slave.cs" />

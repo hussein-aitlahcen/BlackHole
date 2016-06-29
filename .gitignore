@@ -228,3 +228,8 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+# DB Files
+BlackHole.VC.db
+BlackHole.VC.VC.opendb
+
