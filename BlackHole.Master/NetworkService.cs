@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NetMQ.Sockets;
 
 namespace BlackHole.Master
 {
@@ -20,9 +21,8 @@ namespace BlackHole.Master
 
         public const int PING_COUNT_BEFORE_DISCONNECTION = 5;
         
-        private NetMQContext m_netContext;
         private NetMQSocket m_server;
-        private Poller m_poller;
+        private NetMQPoller m_poller;
         private Dictionary<int, Slave> m_slaveById;
         private bool m_started;
         private ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
@@ -41,8 +41,7 @@ namespace BlackHole.Master
         /// </summary>
         public void Start()
         {
-            m_netContext = NetMQContext.Create();
-            m_server = m_netContext.CreateRouterSocket();
+            m_server = new RouterSocket();
             m_server.Bind("tcp://*:5556");
             m_server.ReceiveReady += Server_ReceiveReady;
             m_server.SendReady += Server_SendReady;
@@ -53,12 +52,9 @@ namespace BlackHole.Master
             var sendTimer = new NetMQTimer(SEND_INTERVAL);
             sendTimer.Elapsed += SendQueue;
 
-            m_poller = new Poller();
-            m_poller.PollTimeout = 1;
-            m_poller.AddSocket(m_server);
-            m_poller.AddTimer(heartbeatTimer);
-            m_poller.AddTimer(sendTimer);
-            m_poller.PollTillCancelledNonBlocking();
+            m_poller = new NetMQPoller {m_server, heartbeatTimer, sendTimer};
+            //m_poller.PollTimeout = 1;
+            m_poller.RunAsync();
             m_started = true;
         }
         
@@ -71,7 +67,6 @@ namespace BlackHole.Master
             {
                 m_poller.Dispose();
                 m_server.Dispose();
-                m_netContext.Dispose();
                 m_started = false;
             }
         }

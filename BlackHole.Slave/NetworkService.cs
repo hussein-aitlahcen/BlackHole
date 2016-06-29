@@ -21,14 +21,8 @@ namespace BlackHole.Slave
         /// <summary>
         /// 
         /// </summary>
-        private NetMQContext m_context;
-
-        /// <summary>
-        /// 
-        /// </summary>
         public NetworkService()
         {
-            m_context = NetMQContext.Create();
             m_serverConnections = new List<MasterServer>();
         }
 
@@ -44,7 +38,7 @@ namespace BlackHole.Slave
         /// 
         /// </summary>
         /// <param name="connection"></param>
-        private void CreateConnection(string address) => m_serverConnections.Add(new MasterServer(m_context, address));
+        private void CreateConnection(string address) => m_serverConnections.Add(new MasterServer(address));
 
         /// <summary>
         /// 
