@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using BlackHole.Common.Helpers;
 using BlackHole.Common.Network.Protocol;
 using BlackHole.Slave.Helper.Native.Impl;
 
@@ -50,10 +51,10 @@ namespace BlackHole.Slave.Helper
                 dest.ReleaseHdc(destPtr);
             }
 
-            var compressed = CompressImage(screen, quality);
+            var compressed = ImageHelpers.CompressImage(screen, quality);
             screen.Dispose();
 
-            return new ScreenCaptureMessage()
+            return new ScreenCaptureMessage
             {
                 ScreenNumber = screenNb,
                 Quality = quality,
@@ -61,29 +62,6 @@ namespace BlackHole.Slave.Helper
                 Height = bounds.Height,
                 RawImage = compressed
             };
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="image"></param>
-        /// <param name="imageQuality"></param>
-        /// <returns></returns>
-        private static byte[] CompressImage(Bitmap image, int imageQuality)
-        {            
-            var imageQualitysParameter = new EncoderParameter(
-                        System.Drawing.Imaging.Encoder.Quality, imageQuality);
-            
-            var codecParameter = new EncoderParameters(1);
-            codecParameter.Param[0] = imageQualitysParameter;
-
-            var jpegCodec = ImageCodecInfo.GetImageEncoders().First(codec => codec.MimeType == "image/jpeg");
-
-            using (var stream = new MemoryStream())
-            {
-                image.Save(stream, jpegCodec, codecParameter);
-                return stream.ToArray();
-            }
         }
     }
 }

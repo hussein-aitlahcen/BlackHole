@@ -38,7 +38,7 @@ namespace BlackHole.Slave.Helper.Native
         /// <summary>
         /// 
         /// </summary>
-        private SafeLibraryHandle m_libraryHandle;
+        private readonly SafeLibraryHandle m_libraryHandle;
                 
         /// <summary>
         /// 
@@ -54,17 +54,16 @@ namespace BlackHole.Slave.Helper.Native
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TT"></typeparam>
         /// <param name="functionName"></param>
         /// <returns></returns>
-        public T FindUmanagedFunction<T>(string functionName) where T : class
+        public TT FindUmanagedFunction<TT>(string functionName) where TT : class
         {
             var ptr = DynamicNativeLibraryHelper.GetProcAddress(m_libraryHandle, functionName);
-            
             if (ptr == IntPtr.Zero)            
                 return null;
             
-            return Marshal.GetDelegateForFunctionPointer(ptr, typeof(T)) as T;
+            return Marshal.GetDelegateForFunctionPointer(ptr, typeof(TT)) as TT;
         }
         
         /// <summary>

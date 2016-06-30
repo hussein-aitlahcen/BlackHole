@@ -6,7 +6,8 @@ namespace BlackHole.Common
     /// <summary>
     /// 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TEvent"></typeparam>
+    /// <typeparam name="TSource"></typeparam>
     public interface IEventListener<TEvent, TSource>
         where TEvent : Event<TSource>
     {
@@ -22,7 +23,8 @@ namespace BlackHole.Common
         public int EventType { get; }
         public T Source { get; }
         public object Data { get; }
-        public Event(int eventType, T source, Object data)
+
+        protected Event(int eventType, T source, object data)
         {
             EventType = eventType;
             Source = source;
@@ -60,7 +62,7 @@ namespace BlackHole.Common
         /// <summary>
         /// 
         /// </summary>
-        private List<Subscriber> m_subscriber;
+        private readonly List<Subscriber> m_subscriber;
 
         /// <summary>
         /// 
@@ -74,20 +76,22 @@ namespace BlackHole.Common
         /// 
         /// </summary>
         /// <param name="listener"></param>
-        public void Subscribe(IEventListener<TEvent, TSource> listener) => Subscribe((e) => true, listener);
+        public void Subscribe(IEventListener<TEvent, TSource> listener) => Subscribe(e => true, listener);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="guard"></param>
         /// <param name="listener"></param>
-        public void Subscribe(Predicate<TEvent> guard, IEventListener<TEvent, TSource> listener) => m_subscriber.Add(new Subscriber(guard, listener));
+        public void Subscribe(Predicate<TEvent> guard, IEventListener<TEvent, TSource> listener) 
+            => m_subscriber.Add(new Subscriber(guard, listener));
         
         /// <summary>
         /// 
         /// </summary>
         /// <param name="listener"></param>
-        public void Unsubscribe(IEventListener<TEvent, TSource> listener) => m_subscriber.RemoveAll(s => s.Listener == listener);
+        public void Unsubscribe(IEventListener<TEvent, TSource> listener) 
+            => m_subscriber.RemoveAll(s => s.Listener == listener);
 
         /// <summary>
         /// 

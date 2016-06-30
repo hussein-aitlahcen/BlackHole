@@ -14,6 +14,8 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -42,8 +44,8 @@
       <HintPath>..\packages\AsyncIO.0.1.18.0\lib\net40\AsyncIO.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetMQ, Version=3.3.3.1, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetMQ.3.3.3.1\lib\net40\NetMQ.dll</HintPath>
+    <Reference Include="NetMQ, Version=4.0.0.0, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetMQ.4.0.0.0-beta\lib\net40\NetMQ.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -67,26 +69,28 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FileHelper.cs" />
-    <Compile Include="FileManager.xaml.cs">
-      <DependentUpon>FileManager.xaml</DependentUpon>
+    <Compile Include="FileManagerWindow.xaml.cs">
+      <DependentUpon>FileManagerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileManager.cs" />
-    <Compile Include="MainWindow.cs" />
     <Compile Include="Model\CommandModel.cs" />
     <Compile Include="Model\SlaveMonitorModel.cs" />
     <Compile Include="Model\ViewModel.cs" />
-    <Compile Include="RemoteDesktop.xaml.cs">
-      <DependentUpon>RemoteDesktop.xaml</DependentUpon>
+    <Compile Include="CredentialsWindow.xaml.cs">
+      <DependentUpon>CredentialsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RemoteDesktop.cs" />
+    <Compile Include="WebcamWindow.xaml.cs">
+      <DependentUpon>WebcamWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RemoteDesktopWindow.xaml.cs">
+      <DependentUpon>RemoteDesktopWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Remote\CommandFactory.cs" />
     <Compile Include="Remote\RemoteCommand.cs" />
     <Compile Include="Slave.cs" />
     <Compile Include="Model\ViewModelCollection.cs" />
     <Compile Include="SlaveWindow.cs" />
-    <Compile Include="WindowExtensions.cs" />
-    <Page Include="FileManager.xaml">
+    <Compile Include="Extentions\WindowExtensions.cs" />
+    <Page Include="FileManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -102,7 +106,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="RemoteDesktop.xaml">
+    <Page Include="CredentialsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WebcamWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RemoteDesktopWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1408,6 +1420,7 @@
     <Resource Include="Resources\icons\light\appbar.youtube.png" />
     <Resource Include="Resources\icons\light\appbar.zune.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

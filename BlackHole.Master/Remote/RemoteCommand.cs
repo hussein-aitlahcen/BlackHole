@@ -21,33 +21,33 @@ namespace BlackHole.Master.Remote
     public sealed class RemoteCommand<TIn> : CommandModel, IRemoteCommand
     {
         public string Name { get; }
-        private Action<RemoteCommand<TIn>> m_executeAction;
-        private Action m_faultedAction;
-        private Action<TIn> m_continueAction, m_completedAction;
+        private readonly Action<RemoteCommand<TIn>> m_executeAction;
+        private readonly Action m_faultedAction;
+        private readonly Action<TIn> m_continueAction;
+        private readonly Action<TIn> m_completedAction;
 
-        public RemoteCommand(long id, string name, Slave slave, string headerText, string targetText, Action<RemoteCommand<TIn>> onExecute, Action<TIn> onContinue, Action<TIn> onCompleted, Action onFaulted)
+        public RemoteCommand(long id, string name, Slave slave, string headerText, string targetText, 
+            Action<RemoteCommand<TIn>> onExecute, Action<TIn> onContinue, Action<TIn> onCompleted, Action onFaulted)
             : base(id, slave, headerText, targetText)
         {
             Name = name;
-            m_executeAction = WrapAction(SlaveEventType.COMMAND_EXECUTED, onExecute);
-            m_continueAction = WrapAction(SlaveEventType.COMMAND_CONTINUE, onContinue);
-            m_completedAction = WrapAction(SlaveEventType.COMMAND_COMPLETED, onCompleted);
-            m_faultedAction = WrapAction(SlaveEventType.COMMAND_FAULTED, onFaulted);
+            m_executeAction = WrapAction(SlaveEventType.CommandExecuted, onExecute);
+            m_continueAction = WrapAction(SlaveEventType.CommandContinue, onContinue);
+            m_completedAction = WrapAction(SlaveEventType.CommandCompleted, onCompleted);
+            m_faultedAction = WrapAction(SlaveEventType.CommandFaulted, onFaulted);
         }
 
-        private Action WrapAction(SlaveEventType type, Action action)
-            => () =>
-            {
-                action();
-                Slave.SlaveEvents.PostEvent(new SlaveEvent(type, Slave, this));
-            };
+        private Action WrapAction(SlaveEventType type, Action action) => () =>
+        {
+            action();
+            Slave.SlaveEvents.PostEvent(new SlaveEvent(type, Slave, this));
+        };
 
-        private Action<T> WrapAction<T>(SlaveEventType type, Action<T> action)
-            => (input) =>
-            {
-                action(input);
-                Slave.SlaveEvents.PostEvent(new SlaveEvent(type, Slave, this));
-            };
+        private Action<T> WrapAction<T>(SlaveEventType type, Action<T> action) => input =>
+        {
+            action(input);
+            Slave.SlaveEvents.PostEvent(new SlaveEvent(type, Slave, this));
+        };
 
         public void DoExecute() => m_executeAction(this);
         public void DoContinue(TIn input) => m_continueAction(input);

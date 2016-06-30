@@ -10,7 +10,7 @@ namespace BlackHole.PayloadBuilder
         static void Main(string[] args)
         {
             var directory = Path.GetFullPath(@"..\..\..\BlackHole.Slave\bin\Debug");
-            var exe = Path.Combine(directory, "BlackHole.Slave_packed.exe");
+            var exe = Path.Combine(directory, "BlackHole.Slave.exe");
 
             var payload = File.ReadAllBytes(exe);
 

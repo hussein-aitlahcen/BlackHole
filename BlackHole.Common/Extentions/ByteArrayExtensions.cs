@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace BlackHole.Common
+namespace BlackHole.Common.Extentions
 {
     public static class ByteArrayExtensions
     {

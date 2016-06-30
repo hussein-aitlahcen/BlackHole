@@ -5,8 +5,8 @@ namespace BlackHole.Master.Remote
 {
     public enum CommandType
     {
-        DOWNLOAD,
-        UPLOAD,
+        Download,
+        Upload
     }
 
     public static class CommandFactory
@@ -24,7 +24,7 @@ namespace BlackHole.Master.Remote
         {
             switch (type)
             {
-                case CommandType.DOWNLOAD:
+                case CommandType.Download:
                     return new RemoteCommand<TIn>(
                         NextCommandId,
                         "Download", 
@@ -36,7 +36,7 @@ namespace BlackHole.Master.Remote
                         onCompleted, 
                         onFaulted);
 
-                case CommandType.UPLOAD:
+                case CommandType.Upload:
                     return new RemoteCommand<TIn>(
                         NextCommandId,
                         "Upload",

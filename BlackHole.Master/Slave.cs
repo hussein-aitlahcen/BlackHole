@@ -4,22 +4,21 @@ using NetMQ;
 
 namespace BlackHole.Master
 {
-
     /// <summary>
     /// 
     /// </summary>
     public enum SlaveEventType : int
     {
-        CONNECTED,
-        DISCONNECTED,
-        INCOMMING_MESSAGE,
-        OUTGOING_MESSAGE,
-        COMMAND_EXECUTED,
-        COMMAND_CONTINUE,
-        COMMAND_FAULTED,
-        COMMAND_COMPLETED,
-        FILE_DOWNLOADED,
-        FILE_UPLOADED,
+        Connected,
+        Disconnected,
+        IncommingMessage,
+        OutgoingMessage,
+        CommandExecuted,
+        CommandContinue,
+        CommandFaulted,
+        CommandCompleted,
+        FileDownloaded,
+        FileUploaded
     }
 
     /// <summary>
@@ -52,83 +51,52 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public byte[] Identity
-        {
-            get;
-            private set;
-        }
+        public byte[] Identity { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public int Id
-        {
-            get;
-            private set;
-        }
+        public int Id { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Ip
-        {
-            get;
-            private set;
-        }
+        public string Ip { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string OperatingSystem
-        {
-            get;
-            private set;
-        }
+        public string OperatingSystem { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string MachineName
-        {
-            get;
-            private set;
-        }
+        public string MachineName { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string UserName
-        {
-            get;
-            private set;
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public int PingTimeout
-        {
-            get;
-            set;
-        }
+        public string UserName { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public bool IsInitialized
-        {
-            get;
-            set;
-        }
+        public int PingTimeout { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsInitialized { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         public string OutputDirectory => MachineName;
-        
+
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="identity"></param>
         /// <param name="id"></param>
         public Slave(byte[] identity, int id)
         {
@@ -173,9 +141,8 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="slave"></param>
         /// <param name="message"></param>
-        private void FireSlaveOutgoingMessage(Slave slave, NetMessage message)
-            => Slave.PostEvent(new SlaveEvent(SlaveEventType.OUTGOING_MESSAGE, slave, message));
-
+        private void FireSlaveOutgoingMessage(Slave slave, NetMessage message) =>
+            PostEvent(new SlaveEvent(SlaveEventType.OutgoingMessage, slave, message));
 
         /// <summary>
         /// 
@@ -189,18 +156,13 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public void DecrementPingTimeout()
-        {
-            PingTimeout--;
-        }
+        public void DecrementPingTimeout() => PingTimeout--;
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
-        {
-            return $"ip={Ip} id={Id} machine={MachineName} user={UserName} os={OperatingSystem}";
-        }
+        public override string ToString() =>
+            $"ip={Ip} id={Id} machine={MachineName} user={UserName} os={OperatingSystem}";
     }
 }

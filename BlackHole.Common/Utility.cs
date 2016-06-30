@@ -8,7 +8,7 @@ namespace BlackHole.Common
     /// </summary>
     public static class Utility
     {
-        static string IPIFY = "https://api.ipify.org/";
+        static readonly string IPIFY = "https://api.ipify.org/";
 
         /// <summary>
         /// Wrapper method to simplify such operation.
@@ -16,7 +16,7 @@ namespace BlackHole.Common
         /// If it suceed, the returned object is passed to the "onSuccess" function, else, the Exception is given to the "onError" function.
         /// 
         /// </summary>
-        /// <param name="fun"></param>
+        /// <param name="operation"></param>
         /// <param name="onSuccess"></param>
         /// <param name="onError"></param>
         public static void ExecuteComplexOperation<T>(Func<T> operation, Action<T> onSuccess, Action<Exception> onError)
@@ -30,8 +30,7 @@ namespace BlackHole.Common
                 onError(e);
             }
         }
-
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -43,12 +42,11 @@ namespace BlackHole.Common
                 using (var client = new WebClient())
                     return client.DownloadString(IPIFY);
             }
-            catch(Exception e)
+            catch
             {
                 return "?.?.?.?";
             }
         }
-        
 
         /// <summary>
         /// 
@@ -63,7 +61,7 @@ namespace BlackHole.Common
                 order++;
                 length = length / 1024;
             }
-            return string.Format("{0:0.##} {1}", length, sizes[order]);
+            return $"{length:0.##} {sizes[order]}";
         }
     }
 }

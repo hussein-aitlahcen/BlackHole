@@ -14,16 +14,16 @@ namespace BlackHole.Master
     /// </summary>
     public sealed class NetworkService : Singleton<NetworkService>, IEventListener<SlaveEvent, Slave>
     {
-        public const int SEND_INTERVAL = 10;
-        public const int PING_INTERVAL = 1000;
+        public const int SendInterval = 10;
+        public const int PingInterval = 1000;
+        public const int PingCountBeforeDisconnection = 5;
+        public const int ListnenPort = 5556;
 
-        public const int PING_COUNT_BEFORE_DISCONNECTION = 5;
-        
         private NetMQSocket m_server;
         private NetMQPoller m_poller;
-        private Dictionary<int, Slave> m_slaveById;
+        private readonly Dictionary<int, Slave> m_slaveById;
         private bool m_started;
-        private ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
+        private readonly ConcurrentQueue<NetMQMessage> m_sendQueue = new ConcurrentQueue<NetMQMessage>();
 
         /// <summary>
         /// 
@@ -40,14 +40,14 @@ namespace BlackHole.Master
         public void Start()
         {
             m_server = new RouterSocket();
-            m_server.Bind("tcp://*:5556");
+            m_server.Bind("tcp://*:" + ListnenPort);
             m_server.ReceiveReady += Server_ReceiveReady;
             m_server.SendReady += Server_SendReady;
 
-            var heartbeatTimer = new NetMQTimer(PING_INTERVAL);
+            var heartbeatTimer = new NetMQTimer(PingInterval);
             heartbeatTimer.Elapsed += Heartbeat;
 
-            var sendTimer = new NetMQTimer(SEND_INTERVAL);
+            var sendTimer = new NetMQTimer(SendInterval);
             sendTimer.Elapsed += SendQueue;
 
             m_poller = new NetMQPoller {m_server, heartbeatTimer, sendTimer};
@@ -86,10 +86,10 @@ namespace BlackHole.Master
         /// <param name="e"></param>
         private void SendQueue(object sender, NetMQTimerEventArgs e)
         {
-            NetMQMessage message = null;
             var i = m_sendQueue.Count;
             while (i > 0)
             {
+                NetMQMessage message;
                 if (m_sendQueue.TryDequeue(out message))
                     m_server.TrySendMultipartMessage(message);
                 i--;
@@ -104,10 +104,8 @@ namespace BlackHole.Master
             foreach(var slave in m_slaveById.Values.ToArray())
             {
                 slave.PingAndIncrementTimeout();
-                if (slave.PingTimeout > PING_COUNT_BEFORE_DISCONNECTION)
-                {
+                if (slave.PingTimeout > PingCountBeforeDisconnection)
                     FireSlaveDisconnected(slave);
-                } 
             }
         }
         
@@ -115,10 +113,8 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="slave"></param>
-        private void FireSlaveConnected(Slave slave)
-        {
-            Slave.PostEvent(new SlaveEvent(SlaveEventType.CONNECTED, slave));
-        }
+        private void FireSlaveConnected(Slave slave) =>
+            Slave.PostEvent(new SlaveEvent(SlaveEventType.Connected, slave));
 
         /// <summary>
         /// 
@@ -127,7 +123,7 @@ namespace BlackHole.Master
         private void FireSlaveDisconnected(Slave slave)
         {
             m_slaveById.Remove(slave.Id);
-            Slave.PostEvent(new SlaveEvent(SlaveEventType.DISCONNECTED, slave));
+            Slave.PostEvent(new SlaveEvent(SlaveEventType.Disconnected, slave));
         }
 
         /// <summary>
@@ -135,8 +131,8 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="slave"></param>
         /// <param name="message"></param>
-        private void FireSlaveIncommingMessage(Slave slave, NetMessage message)
-            => Slave.PostEvent(new SlaveEvent(SlaveEventType.INCOMMING_MESSAGE, slave, message));
+        private void FireSlaveIncommingMessage(Slave slave, NetMessage message) =>
+            Slave.PostEvent(new SlaveEvent(SlaveEventType.IncommingMessage, slave, message));
         
         /// <summary>
         /// 
@@ -162,7 +158,7 @@ namespace BlackHole.Master
             var clientId = BitConverter.ToInt32(identity, 1);
             var message = NetMessage.Deserialize(mqmessage.Last.Buffer);
             
-            Slave slave = null;
+            Slave slave;
             if (!m_slaveById.ContainsKey(clientId))            
                 m_slaveById.Add(clientId, slave = new Slave(identity, clientId));            
             else
@@ -179,19 +175,17 @@ namespace BlackHole.Master
         {
             switch ((SlaveEventType)ev.EventType)
             {
-                case SlaveEventType.INCOMMING_MESSAGE:
-                    ev.Data
-                        .Match()
+                case SlaveEventType.IncommingMessage:
+                {
+                    ev.Data.Match()
                         .With<GreetTheMasterMessage>(m =>
                         {
-                            if(ev.Source.Initialize(m.Ip, m.OperatingSystem, m.MachineName, m.UserName))
+                            if (ev.Source.Initialize(m.Ip, m.OperatingSystem, m.MachineName, m.UserName))
                                 FireSlaveConnected(ev.Source);
                         })
-                        .With<PongMessage>(m =>
-                        {
-                            ev.Source.DecrementPingTimeout();
-                        });
+                        .With<PongMessage>(m => ev.Source.DecrementPingTimeout());
                     break;
+                }
             }
         }
     }

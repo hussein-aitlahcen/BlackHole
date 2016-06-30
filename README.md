@@ -21,7 +21,7 @@
 We pack the slave into a single .net executable with ILMerge, then we create the according C++ file with the PayloadBuilder. Finally, we build the Loader. When the target start the loader, it will load the CLR and dynamically load the packed Slave from its memory.
 
 # Getting started
-1. Build BlackHole.Slave and pack it with it dependencies with ILMerge as "BlackHole.Slave_packed.exe"
+1. Build BlackHole.Slave (Will automaticly be packed with its dependencies using ILMerge)
 2. Launch BlackHole.PayloadBuilder (will create a C++ file containing the packed slave in binary format)
 3. Build BlackHole.Loader 
 4. Enjoy delivering a single C++ executable

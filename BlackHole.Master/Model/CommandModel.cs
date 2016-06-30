@@ -39,7 +39,7 @@ namespace BlackHole.Master.Model
         private long m_progress;
         private Brush m_progressColor;
 
-        public CommandModel(long id, Slave slave, string headerText, string targetText)
+        protected CommandModel(long id, Slave slave, string headerText, string targetText)
         {
             Id = id;
             Slave = slave;
@@ -48,6 +48,6 @@ namespace BlackHole.Master.Model
             m_progressColor = Brushes.Green;
         }
 
-        public void UpdateProgression(long current, long maximum) => Progress = ((current + 1) * 100) / Math.Max(maximum, 1);
+        public void UpdateProgression(long current, long maximum) => Progress = (current + 1) * 100 / Math.Max(maximum, 1);
     }
 }
