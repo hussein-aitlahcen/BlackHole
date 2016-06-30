@@ -69,25 +69,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FileHelper.cs" />
+    <Compile Include="Helper\FileHelper.cs" />
     <Compile Include="FileManager.xaml.cs">
       <DependentUpon>FileManager.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileManager.cs" />
-    <Compile Include="MainWindow.cs" />
     <Compile Include="Model\CommandModel.cs" />
     <Compile Include="Model\SlaveMonitorModel.cs" />
     <Compile Include="Model\ViewModel.cs" />
+    <Compile Include="CredentialsWindow.xaml.cs">
+      <DependentUpon>CredentialsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RemoteDesktop.xaml.cs">
       <DependentUpon>RemoteDesktop.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RemoteDesktop.cs" />
     <Compile Include="Remote\CommandFactory.cs" />
     <Compile Include="Remote\RemoteCommand.cs" />
     <Compile Include="Slave.cs" />
     <Compile Include="Model\ViewModelCollection.cs" />
     <Compile Include="SlaveWindow.cs" />
-    <Compile Include="WindowExtensions.cs" />
+    <Compile Include="Extentions\WindowExtensions.cs" />
     <Page Include="FileManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -104,6 +104,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="CredentialsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="RemoteDesktop.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

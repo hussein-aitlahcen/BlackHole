@@ -9,16 +9,16 @@ namespace BlackHole.Master
     /// </summary>
     public enum SlaveEventType : int
     {
-        CONNECTED,
-        DISCONNECTED,
-        INCOMMING_MESSAGE,
-        OUTGOING_MESSAGE,
-        COMMAND_EXECUTED,
-        COMMAND_CONTINUE,
-        COMMAND_FAULTED,
-        COMMAND_COMPLETED,
-        FILE_DOWNLOADED,
-        FILE_UPLOADED
+        Connected,
+        Disconnected,
+        IncommingMessage,
+        OutgoingMessage,
+        CommandExecuted,
+        CommandContinue,
+        CommandFaulted,
+        CommandCompleted,
+        FileDownloaded,
+        FileUploaded
     }
 
     /// <summary>
@@ -51,72 +51,42 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public byte[] Identity
-        {
-            get;
-        }
+        public byte[] Identity { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public int Id
-        {
-            get;
-        }
+        public int Id { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Ip
-        {
-            get;
-            private set;
-        }
+        public string Ip { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string OperatingSystem
-        {
-            get;
-            private set;
-        }
+        public string OperatingSystem { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string MachineName
-        {
-            get;
-            private set;
-        }
+        public string MachineName { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string UserName
-        {
-            get;
-            private set;
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public int PingTimeout
-        {
-            get;
-            set;
-        }
+        public string UserName { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public bool IsInitialized
-        {
-            get;
-            set;
-        }
+        public int PingTimeout { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsInitialized { get; set; }
 
         /// <summary>
         /// 
@@ -171,8 +141,8 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="slave"></param>
         /// <param name="message"></param>
-        private void FireSlaveOutgoingMessage(Slave slave, NetMessage message)
-            => PostEvent(new SlaveEvent(SlaveEventType.OUTGOING_MESSAGE, slave, message));
+        private void FireSlaveOutgoingMessage(Slave slave, NetMessage message) =>
+            PostEvent(new SlaveEvent(SlaveEventType.OutgoingMessage, slave, message));
 
         /// <summary>
         /// 
@@ -186,10 +156,7 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        public void DecrementPingTimeout()
-        {
-            PingTimeout--;
-        }
+        public void DecrementPingTimeout() => PingTimeout--;
 
         /// <summary>
         /// 

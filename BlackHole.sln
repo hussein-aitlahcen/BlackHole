@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackHole.Common", "BlackHole.Common\BlackHole.Common.csproj", "{8D0EC007-217B-4AFD-8374-18192DC783EE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlackHole.Loader", "BlackHole.Loader\BlackHole.Loader.vcxproj", "{C7F9AF0A-96D5-414F-9EEC-2F20AD89E0C9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F453212F-5B9B-4F8F-A8B9-28BEF55F0933} = {F453212F-5B9B-4F8F-A8B9-28BEF55F0933}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackHole.PayloadBuilder", "BlackHole.PayloadBuilder\BlackHole.PayloadBuilder.csproj", "{7DFC4A37-0CE2-43BE-A4D8-2DACB78F1E41}"
 EndProject

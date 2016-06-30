@@ -8,11 +8,11 @@ namespace BlackHole.Master.Model
         /// 
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChange(string propertyName)
-        {
-            var handler = PropertyChanged;
-            if (handler != null)
-                handler(this, new PropertyChangedEventArgs(propertyName));
-        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void NotifyPropertyChange(string propertyName) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

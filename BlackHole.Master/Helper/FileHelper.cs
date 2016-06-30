@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using BlackHole.Common;
 
-namespace BlackHole.Master
+namespace BlackHole.Master.Helper
 {
     /// <summary>
     /// 
@@ -15,8 +15,8 @@ namespace BlackHole.Master
         /// <param name="fileName"></param>
         /// <param name="currentPart"></param>
         /// <param name="rawData"></param>
-        public static void WriteDownloadedPart(string directory, string fileName, long currentPart, byte[] rawData)
-            => CommonHelper.WriteDownloadedPart(directory, fileName, currentPart, rawData);
+        public static void WriteDownloadedPart(string directory, string fileName, long currentPart, byte[] rawData) =>
+            CommonHelper.WriteDownloadedPart(directory, fileName, currentPart, rawData);
 
         /// <summary>
         /// 

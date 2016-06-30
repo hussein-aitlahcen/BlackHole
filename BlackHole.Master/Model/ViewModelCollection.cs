@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace BlackHole.Master.Model
 {
@@ -11,11 +10,7 @@ namespace BlackHole.Master.Model
         /// <summary>
         /// 
         /// </summary>
-        public ObservableCollection<T> Items
-        {
-            get;
-            set;
-        }
+        public ObservableCollection<T> Items { get; set; }
         
         /// <summary>
         /// 
@@ -29,26 +24,17 @@ namespace BlackHole.Master.Model
         /// 
         /// </summary>
         /// <param name="item"></param>
-        public void AddItem(T item)
-        {
-            Items.Add(item);
-        }
+        public void AddItem(T item) => Items.Add(item);
 
         /// <summary>
         /// 
         /// </summary>
-        public void Clear()
-        {
-            Items.ToList().ForEach(RemoveItem);
-        }
+        public void Clear() => Items.Clear();//.ToList().ForEach(RemoveItem);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="item"></param>
-        public void RemoveItem(T item)
-        {
-            Items.Remove(item);
-        }
+        public void RemoveItem(T item) => Items.Remove(item);
     }
 }
