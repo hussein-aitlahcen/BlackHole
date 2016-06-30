@@ -8,11 +8,11 @@ using BlackHole.Master.Extentions;
 namespace BlackHole.Master
 {
     /// <summary>
-    /// Logique d'interaction pour RemoteDesktop.xaml
+    /// Logique d'interaction pour RemoteDesktopWindow.xaml
     /// </summary>
-    public partial class RemoteDesktop : SlaveWindow
+    public partial class RemoteDesktopWindow : SlaveWindow
     {
-        public RemoteDesktop()
+        public RemoteDesktopWindow()
         {
             InitializeComponent();
         }
@@ -21,7 +21,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="slave"></param>
-        public RemoteDesktop(Slave slave)
+        public RemoteDesktopWindow(Slave slave)
             : base(slave)
         {
             InitializeComponent();

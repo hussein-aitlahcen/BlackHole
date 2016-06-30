@@ -97,6 +97,10 @@
       <Project>{8d0ec007-217b-4afd-8374-18192dc783ee}</Project>
       <Name>BlackHole.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dependencies\LibCredentials\LibCredentials\LibCredentials.csproj">
+      <Project>{45ac2e98-953c-4dda-a2dc-73c9b1301e57}</Project>
+      <Name>LibCredentials</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -70,8 +70,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Helper\FileHelper.cs" />
-    <Compile Include="FileManager.xaml.cs">
-      <DependentUpon>FileManager.xaml</DependentUpon>
+    <Compile Include="FileManagerWindow.xaml.cs">
+      <DependentUpon>FileManagerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\CommandModel.cs" />
     <Compile Include="Model\SlaveMonitorModel.cs" />
@@ -79,8 +79,8 @@
     <Compile Include="CredentialsWindow.xaml.cs">
       <DependentUpon>CredentialsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RemoteDesktop.xaml.cs">
-      <DependentUpon>RemoteDesktop.xaml</DependentUpon>
+    <Compile Include="RemoteDesktopWindow.xaml.cs">
+      <DependentUpon>RemoteDesktopWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Remote\CommandFactory.cs" />
     <Compile Include="Remote\RemoteCommand.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="Model\ViewModelCollection.cs" />
     <Compile Include="SlaveWindow.cs" />
     <Compile Include="Extentions\WindowExtensions.cs" />
-    <Page Include="FileManager.xaml">
+    <Page Include="FileManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -108,7 +108,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="RemoteDesktop.xaml">
+    <Page Include="RemoteDesktopWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1414,6 +1414,7 @@
     <Resource Include="Resources\icons\light\appbar.youtube.png" />
     <Resource Include="Resources\icons\light\appbar.zune.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

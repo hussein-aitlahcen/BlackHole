@@ -13,14 +13,14 @@ using BlackHole.Master.Helper;
 namespace BlackHole.Master
 {
     /// <summary>
-    /// Logique d'interaction pour FileManager.xaml
+    /// Logique d'interaction pour FileManagerWindow.xaml
     /// </summary>
-    public partial class FileManager : SlaveWindow
+    public partial class FileManagerWindow : SlaveWindow
     {
         /// <summary>
         /// 
         /// </summary>
-        public FileManager()
+        public FileManagerWindow()
         {
             InitializeComponent();      
         }
@@ -59,7 +59,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="slave"></param>
-        public FileManager(Slave slave) : base(slave)
+        public FileManagerWindow(Slave slave) : base(slave)
         {
             InitializeComponent();
 
@@ -87,7 +87,7 @@ namespace BlackHole.Master
         /// </summary>
         private void DeleteSelectedFiles() => ExecuteOnSelectedItems<FileMeta>(FilesList, meta =>
         {
-            if (meta.Type == FileType.FILE)
+            if (meta.Type == FileType.File)
                 DeleteFile(meta.Name);
         });
 
@@ -142,7 +142,7 @@ namespace BlackHole.Master
         private void OnFolderDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var file = ((ListViewItem)sender).Content as FileMeta;
-            if (file?.Type == FileType.FOLDER)
+            if (file?.Type == FileType.Folder)
                 NavigateToFolder(file.Name);
         }
 
@@ -158,7 +158,7 @@ namespace BlackHole.Master
         /// </summary>
         private void DownloadSelectedFiles() => ExecuteOnSelectedItems<FileMeta>(FilesList, meta =>
         {
-            if (meta.Type == FileType.FILE)
+            if (meta.Type == FileType.File)
                 DownloadFile(meta.Name);
         });
 
@@ -167,7 +167,7 @@ namespace BlackHole.Master
         /// </summary>
         private void ExecuteSelectedFiles() => ExecuteOnSelectedItems<FileMeta>(FilesList, meta =>
         {
-            if (meta.Type == FileType.FILE)
+            if (meta.Type == FileType.File)
                 ExecuteFile(meta.Name);
         });
 
