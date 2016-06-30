@@ -162,9 +162,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
-        {
-            return $"ip={Ip} id={Id} machine={MachineName} user={UserName} os={OperatingSystem}";
-        }
+        public override string ToString() =>
+            $"ip={Ip} id={Id} machine={MachineName} user={UserName} os={OperatingSystem}";
     }
 }
