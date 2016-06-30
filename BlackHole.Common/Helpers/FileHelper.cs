@@ -1,7 +1,6 @@
 ﻿using System.IO;
-using BlackHole.Common;
 
-namespace BlackHole.Master.Helper
+namespace BlackHole.Common.Helpers
 {
     /// <summary>
     /// 

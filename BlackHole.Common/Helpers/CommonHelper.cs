@@ -1,14 +1,14 @@
 ﻿using System.IO;
 using BlackHole.Common.Network.Protocol;
 
-namespace BlackHole.Common
+namespace BlackHole.Common.Helpers
 {
     public static class CommonHelper
     {
         /// <summary>
         /// Chunck to download
         /// </summary>
-        public const int FILE_PART_SIZE = 64 * 1000;
+        public const int FilePartSize = 64 * 1000;
 
         /// <summary>
         /// 
@@ -23,12 +23,12 @@ namespace BlackHole.Common
 
             using (var stream = new FileStream(path, FileMode.Open))
             {
-                var totalPart = stream.Length / FILE_PART_SIZE;
+                var totalPart = stream.Length / FilePartSize;
 
-                var partSize = currentPart != totalPart ? FILE_PART_SIZE : stream.Length - FILE_PART_SIZE * currentPart;
+                var partSize = currentPart != totalPart ? FilePartSize : stream.Length - FilePartSize * currentPart;
                 // read only one chunck
                 var output = new byte[partSize];
-                stream.Seek(FILE_PART_SIZE * currentPart, SeekOrigin.Begin);
+                stream.Seek(FilePartSize * currentPart, SeekOrigin.Begin);
                 stream.Read(output, 0, (int)partSize);
 
                 return new DownloadedFilePartMessage
@@ -60,7 +60,7 @@ namespace BlackHole.Common
             // output the part to local file
             using(var stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
-                stream.Seek(FILE_PART_SIZE * currentPart, SeekOrigin.Begin);
+                stream.Seek(FilePartSize * currentPart, SeekOrigin.Begin);
                 stream.Write(rawData, 0, rawData.Length);
             }
         }

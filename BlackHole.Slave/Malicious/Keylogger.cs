@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlackHole.Common;
+using BlackHole.Common.Extentions;
 using BlackHole.Slave.Helper;
 using Gma.System.MouseKeyHook;
 

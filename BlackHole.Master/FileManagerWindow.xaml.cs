@@ -7,8 +7,8 @@ using BlackHole.Common.Network.Protocol;
 using BlackHole.Master.Model;
 using BlackHole.Master.Remote;
 using System.IO;
+using BlackHole.Common.Helpers;
 using BlackHole.Master.Extentions;
-using BlackHole.Master.Helper;
 
 namespace BlackHole.Master
 {

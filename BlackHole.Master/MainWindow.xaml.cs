@@ -250,5 +250,8 @@ namespace BlackHole.Master
 
         private void OpenCredentialsWindow(object sender, RoutedEventArgs e) =>
             OpenSlaveWindowIfSelected(slave => new CredentialsWindow(slave));
+
+        private void OpenWebcamWindow(object sender, RoutedEventArgs e) =>
+            OpenSlaveWindowIfSelected(slave => new WebcamWindow(slave));
     }
 }
