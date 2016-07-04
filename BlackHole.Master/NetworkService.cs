@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using BlackHole.Common;
 using BlackHole.Common.Network.Protocol;
 using NetMQ;
@@ -43,16 +44,27 @@ namespace BlackHole.Master
             m_server.Bind("tcp://*:" + ListnenPort);
             m_server.ReceiveReady += Server_ReceiveReady;
             m_server.SendReady += Server_SendReady;
-
-            var heartbeatTimer = new NetMQTimer(PingInterval);
-            heartbeatTimer.Elapsed += Heartbeat;
-
-            var sendTimer = new NetMQTimer(SendInterval);
-            sendTimer.Elapsed += SendQueue;
-
-            m_poller = new NetMQPoller {m_server, heartbeatTimer, sendTimer};
-            //m_poller.PollTimeout = 1;
-            m_poller.RunAsync();
+            new Thread(() =>
+            {
+                long nextSend = 0, nextHeartBeat = 0;
+                while (true)
+                {
+                    m_server.Poll(TimeSpan.FromMilliseconds(1));
+                    if (nextSend <= 0)
+                    {
+                        SendQueue();
+                        nextSend = SendInterval;
+                    }
+                    if (nextHeartBeat <= 0)
+                    {
+                        Heartbeat();
+                        nextHeartBeat = PingInterval;
+                    }
+                    nextSend -= 10;
+                    nextHeartBeat -= 10;
+                    Thread.Sleep(10);
+                }
+            }) { IsBackground = true }.Start();
             m_started = true;
         }
         
@@ -82,9 +94,7 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SendQueue(object sender, NetMQTimerEventArgs e)
+        private void SendQueue()
         {
             var i = m_sendQueue.Count;
             while (i > 0)
@@ -99,7 +109,7 @@ namespace BlackHole.Master
         /// <summary>
         /// 
         /// </summary>
-        private void Heartbeat(object sender, NetMQTimerEventArgs e)
+        private void Heartbeat()
         {
             foreach(var slave in m_slaveById.Values.ToArray())
             {

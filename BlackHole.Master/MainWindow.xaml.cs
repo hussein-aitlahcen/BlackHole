@@ -120,26 +120,27 @@ namespace BlackHole.Master
                 switch ((SlaveEventType) ev.EventType)
                 {
                     case SlaveEventType.Connected:
-                    {
-                        ViewModelSlaves.AddItem(ev.Source);
-                        UpdateOnlineSlaves();
-                        AddInfoMessage($"connected slave={ev.Source}");
+                        {
+                            ViewModelSlaves.AddItem(ev.Source);
+                            UpdateOnlineSlaves();
+                            AddInfoMessage($"connected slave={ev.Source}");
+                        }
                         break;
-                    }
                     case SlaveEventType.Disconnected:
-                    {
-                        ViewModelSlaves.RemoveItem(ev.Source);
-                        UpdateOnlineSlaves();
-                        CloseSlaveWindows(ev.Source.Id);
-                        AddInfoMessage($"disconnected slave={ev.Source}");
+                        {
+                            ViewModelSlaves.RemoveItem(ev.Source);
+                            UpdateOnlineSlaves();
+                            CloseSlaveWindows(ev.Source.Id);
+                            AddInfoMessage($"disconnected slave={ev.Source}");
+                        }
                         break;
-                }
-                case SlaveEventType.IncommingMessage:
-                    {
-                        if (!(ev.Data is PongMessage))
-                            AddInfoMessage($"received id={ev.Source.Id} slave={ev.Source.UserName} message={ev.Data.GetType().Name}");
+                    case SlaveEventType.IncommingMessage:
+                        {
+                            //if (!(ev.Data is PongMessage))
+                                //AddInfoMessage($"received id={ev.Source.Id} slave={ev.Source.UserName} message={ev.Data.GetType().Name}");
+                        
+                        }
                         break;
-                    }
                 }
             });
         }

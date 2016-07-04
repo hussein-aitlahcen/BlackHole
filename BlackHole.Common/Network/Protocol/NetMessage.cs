@@ -169,6 +169,7 @@ namespace BlackHole.Common.Network.Protocol
     public sealed class StartWebcamCaptureMessage : NetMessage
     {
         public int ScreenNumber { get; set; }
+        public int DesiredFrameRate { get; set; }
         public int Quality { get; set; }
     }
 
