@@ -16,6 +16,8 @@
 - Remote file execution
 - Remote desktop (quality + fps)
 - Cancelable download/upload
+- Remote webcam capture
+- Password recovery from differents sources
 
 # How it works
 We pack the slave into a single .net executable with ILMerge, then we create the according C++ file with the PayloadBuilder. Finally, we build the Loader. When the target start the loader, it will load the CLR and dynamically load the packed Slave from its memory.
