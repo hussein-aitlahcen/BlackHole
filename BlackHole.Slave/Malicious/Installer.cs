@@ -1,6 +1,7 @@
 ﻿using BlackHole.Common;
 using BlackHole.Slave.Helper;
 using Microsoft.Win32;
+using System.Threading.Tasks.Task;
 
 namespace BlackHole.Slave.Malicious
 {
