@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/sbpyroacrb52hb57?svg=true)](https://ci.appveyor.com/project/hussein-aitlahcen/blackhole)
+
 # BlackHole
 - C# RAT (Remote Adminitration Tool) 
 - Educational purposes only
