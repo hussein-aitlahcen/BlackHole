@@ -22,7 +22,7 @@
 - Password recovery from differents sources
 
 # How it works
-We pack the slave into a single .net executable with ILMerge, then we create the according C++ file with the PayloadBuilder. Finally, we build the Loader. When the target start the loader, it will load the CLR and dynamically load the packed Slave from its memory.
+We pack the slave into a single .net executable with ILMerge, then we create the according C++ file with the PayloadBuilder. Finally, we build the Loader. When the target start the loader, it will load the CLR and dynamically load the packed Slave from its memory (managed C# executed inside C++ launcher).
 
 # Getting started
 1. Build BlackHole.Slave (Will automaticly be packed with its dependencies using ILMerge)
